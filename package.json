@@ -1,0 +1,12 @@
+{
+  "name": "swiftpay-assets",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i frontend/app.css -o static/app.min.css --minify && esbuild frontend/icons.js --bundle --minify --legal-comments=linked --outfile=static/icons.min.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "lucide": "0.577.0",
+    "tailwindcss": "3.4.19"
+  }
+}

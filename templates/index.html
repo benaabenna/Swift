@@ -4,34 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SwiftPay Global — International Money Transfer & Multi-Currency Wallet</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        navy: { 950: '#061021', 900: '#0A192F', 800: '#112240', 700: '#1D3557' },
-                        emerald: { 400: '#34D399', 500: '#10B981', 600: '#059669', 700: '#047857' }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @media print {
-            body * { visibility: hidden; }
-            #printable-receipt-area, #printable-receipt-area * { visibility: visible; }
-            #printable-receipt-area { position: fixed; left: 0; top: 0; width: 100%; background: white; padding: 2rem; }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.min.css') }}">
+    <script defer src="{{ url_for('static', filename='icons.min.js') }}"></script>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white">
 
@@ -56,7 +30,7 @@
                         <input type="email" id="auth-login-email" placeholder="you@example.com" class="w-full rounded-xl border border-white/10 bg-navy-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                     </div>
                     <button type="button" id="btn-auth-login" onclick="doLogin()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-navy-950 font-bold text-sm py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 transition-all">Sign In & Access Wallet</button>
-                    <p class="text-center text-xs text-slate-500">Tier 1: $2,500/day &bull; Tier 2 (KYC): $50,000/day</p>
+                    <p class="text-center text-xs text-slate-400">Use sample details. Email is used to look up a demo profile.</p>
                 </div>
                 <div id="auth-register-form" class="space-y-4 hidden">
                     <div>
@@ -72,14 +46,14 @@
                         <input type="tel" id="auth-reg-phone" placeholder="+254 7XX XXX XXX" class="w-full rounded-xl border border-white/10 bg-navy-950 px-4 py-3 text-sm text-white placeholder-slate-500 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500">
                     </div>
                     <button type="button" id="btn-auth-register" onclick="doRegister()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-navy-950 font-bold text-sm py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 transition-all">Create Account</button>
-                    <p class="text-center text-xs text-slate-500">By registering you agree to our Terms & Privacy Policy</p>
+                    <p class="text-center text-xs text-slate-500">Use sample details for this demo.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- TOAST -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-[70] flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" role="status" class="fixed bottom-5 right-5 z-[110] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- HEADER -->
     <header class="sticky top-0 z-40 bg-navy-900/95 backdrop-blur-md border-b border-white/10 text-white">
@@ -91,7 +65,7 @@
                     </div>
                     <div>
                         <span class="font-display font-extrabold text-xl tracking-tight text-white">Swift<span class="text-emerald-400">Pay</span></span>
-                        <span class="hidden sm:inline-block ml-1.5 text-[10px] font-semibold uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">Live Platform</span>
+                        <span class="hidden sm:inline-block ml-1.5 text-[10px] font-semibold uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">Demo</span>
                     </div>
                 </a>
                 <nav class="hidden lg:flex items-center gap-1.5 bg-navy-950/70 p-1.5 rounded-2xl border border-white/10 text-xs font-semibold">
@@ -157,18 +131,18 @@
                     <div class="lg:col-span-6 space-y-6">
                         <div class="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5 text-xs font-semibold text-emerald-300">
                             <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-                            <span>Instant M-Pesa, Bank & Cash Payouts in 140+ Countries</span>
+                            <span>Explore simulated mobile, bank and cash transfers</span>
                         </div>
                         <h1 class="font-display text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-                            Send money globally at the <span class="text-emerald-400">real exchange rate.</span>
+                            Try a global transfer with <span class="text-emerald-400">estimated exchange rates.</span>
                         </h1>
                         <p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl">
-                            Zero hidden markups, instant mobile wallet delivery, and bank-grade 256-bit security. Lock in live mid-market FX rates for 5 minutes and track every transfer in real time.
+                            Try a multi-currency wallet and follow a sample transfer from quote to receipt. Transfers and identity checks are simulated.
                         </p>
                         <div class="grid grid-cols-3 gap-4 pt-2 border-t border-white/10">
-                            <div><div class="font-display font-extrabold text-xl sm:text-2xl text-white">&lt; 2 mins</div><div class="text-xs text-slate-400">M-Pesa & Wallet Speed</div></div>
-                            <div><div class="font-display font-extrabold text-xl sm:text-2xl text-emerald-400">0% Markup</div><div class="text-xs text-slate-400">Mid-Market FX Rates</div></div>
-                            <div><div class="font-display font-extrabold text-xl sm:text-2xl text-white">256-Bit</div><div class="text-xs text-slate-400">TLS & PCI-DSS Level 1</div></div>
+                            <div><div class="font-display font-extrabold text-xl sm:text-2xl text-white">3 options</div><div class="text-xs text-slate-400">Sample delivery methods</div></div>
+                            <div><div class="font-display font-extrabold text-xl sm:text-2xl text-emerald-400">8 currencies</div><div class="text-xs text-slate-400">Currency calculator</div></div>
+                            <div><div class="font-display font-extrabold text-xl sm:text-2xl text-white">Test funds</div><div class="text-xs text-slate-400">Demo wallet</div></div>
                         </div>
                     </div>
                     <div class="lg:col-span-6">
@@ -197,7 +171,7 @@
                                     <button type="button" id="swap-currencies-btn" class="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm hover:border-emerald-500 hover:text-emerald-600 flex items-center justify-center transition-all"><i data-lucide="arrow-up-down" class="w-3.5 h-3.5"></i></button>
                                     <div class="flex items-center justify-between"><span>Transfer Fee</span><span id="calc-fee" class="font-bold text-navy-900">4.74 USD</span></div>
                                     <div class="flex items-center justify-between"><span>Amount Converted</span><span id="calc-net-amount" class="font-semibold text-slate-800">495.26 USD</span></div>
-                                    <div class="flex items-center justify-between"><span class="flex items-center gap-1.5">Guaranteed Rate <span id="calc-savings" class="text-[11px] font-semibold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full">Save ~$18.00 vs banks</span></span><span id="calc-rate-display" class="font-bold text-emerald-700">1 USD = 129.50 KES</span></div>
+                                    <div class="flex items-center justify-between"><span class="flex items-center gap-1.5">Estimated Rate <span id="calc-savings" class="text-[11px] font-semibold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full">Save ~$18.00 vs banks</span></span><span id="calc-rate-display" class="font-bold text-emerald-700">1 USD = 129.50 KES</span></div>
                                 </div>
                                 <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
                                     <div class="flex items-center justify-between text-xs font-semibold text-slate-500 mb-1"><label>Recipient Gets</label><span id="calc-eta" class="text-emerald-700 font-bold">Within 2 minutes</span></div>
@@ -305,7 +279,7 @@
     <!-- VIEW 4: LEDGER -->
     <section id="view-ledger" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
         <div class="flex flex-wrap items-center justify-between gap-4">
-            <div><h2 class="font-display text-2xl sm:text-3xl font-extrabold text-navy-900">Transaction Ledger & Statements</h2><p class="text-sm text-slate-500">Audit all international transfers, download official PDF receipts, or export CSV statements.</p></div>
+            <div><h2 class="font-display text-2xl sm:text-3xl font-extrabold text-navy-900">Transaction Ledger & Statements</h2><p class="text-sm text-slate-500">Audit all international transfers, print demo receipts, or export CSV statements.</p></div>
             <button type="button" onclick="exportTransactionsCSV()" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold text-sm px-4 py-2.5 rounded-xl"><i data-lucide="download" class="w-4 h-4"></i> Export CSV Statement</button>
         </div>
         <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
@@ -345,7 +319,7 @@
                     <h3 class="font-display font-bold text-lg text-navy-900">Tier 1: Phone & Email OTP Verification</h3>
                     <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Active</span>
                 </div>
-                <p class="text-sm text-slate-600">Enables international transfers up to $2,500/day with instant M-Pesa and bank payouts.</p>
+                <p class="text-sm text-slate-600">Try a sample verification code. No message is sent, and the limit applies only to simulated transfers.</p>
                 <div class="flex gap-2">
                     <input type="text" id="kyc-otp-input" placeholder="6-digit OTP" class="flex-1 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-mono">
                     <button type="button" onclick="sendMockOTP()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-navy-900">Send OTP</button>
@@ -365,7 +339,7 @@
                 </div>
                 <label class="block border-2 border-dashed border-slate-300 rounded-2xl p-4 text-center cursor-pointer hover:border-emerald-500 transition-colors">
                     <input type="file" class="hidden" onchange="handleKYCDocPreview(this)">
-                    <span id="kyc-file-label" class="text-xs font-semibold text-slate-600">Click to attach front/back ID scan (JPG, PNG, PDF)</span>
+                    <span id="kyc-file-label" class="text-xs font-semibold text-slate-600">Choose a sample file for preview. Do not use a real identity document.</span>
                 </label>
                 <button type="button" id="submit-tier2-btn" onclick="submitTier2KYC()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold text-sm py-3 rounded-xl">Submit Identity Verification</button>
             </div>
@@ -375,8 +349,8 @@
     <!-- FOOTER -->
     <footer class="bg-navy-950 text-slate-400 border-t border-white/10 py-10 mt-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-            <div class="flex items-center gap-2"><span class="font-display font-bold text-white text-base">Swift<span class="text-emerald-400">Pay</span> Global</span><span>&bull; Licensed Remittance & FX Infrastructure</span></div>
-            <div id="cloud-sync-status" class="font-mono text-emerald-400/90">Backend: tinyurl.pythonanywhere.com</div>
+            <div class="flex items-center gap-2"><span class="font-display font-bold text-white text-base">Swift<span class="text-emerald-400">Pay</span> Global</span><span>&bull; Demo • No real money or identity checks</span></div>
+            <div id="cloud-sync-status" class="font-mono text-emerald-400/90">Wallet server: waiting for profile</div>
         </div>
     </footer>
 
@@ -448,12 +422,12 @@
                     </div>
                     <div class="pt-2 flex items-center justify-between gap-3">
                         <button type="button" onclick="goToModalStep(2)" class="px-4 py-3.5 rounded-xl border border-slate-300 text-sm font-bold text-slate-700 hover:bg-slate-50">← Back</button>
-                        <button type="button" id="confirm-send-btn" onclick="executeSimulatedTransfer()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-display font-bold text-sm py-3.5 px-5 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i><span>Confirm & Send Now</span></button>
+                        <button type="button" id="confirm-send-btn" onclick="executeSimulatedTransfer()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-display font-bold text-sm py-3.5 px-5 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i><span>Simulate Transfer</span></button>
                     </div>
                 </div>
                 <div id="modal-step-4" class="hidden p-6 sm:p-8 text-center space-y-5">
                     <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto"><i data-lucide="check-circle-2" class="w-9 h-9"></i></div>
-                    <div><span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Transfer Dispatched</span><h4 class="font-display text-2xl font-extrabold text-navy-900 mt-1" id="receipt-amount">—</h4><p class="text-sm text-slate-500 mt-1">On its way to <strong id="receipt-recipient" class="text-slate-800">—</strong></p></div>
+                    <div><span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Simulated Transfer</span><h4 class="font-display text-2xl font-extrabold text-navy-900 mt-1" id="receipt-amount">—</h4><p class="text-sm text-slate-500 mt-1">On its way to <strong id="receipt-recipient" class="text-slate-800">—</strong></p></div>
                     <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-xs space-y-2 text-left">
                         <div class="flex justify-between"><span class="text-slate-500">Tracking Reference</span><span id="receipt-id" class="font-mono font-bold text-navy-900">—</span></div>
                         <div class="flex justify-between"><span class="text-slate-500">Estimated Delivery</span><span id="receipt-eta" class="font-bold text-emerald-700">—</span></div>
@@ -483,22 +457,11 @@
                             <select id="topup-currency" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-bold bg-white"><option value="USD">🇺🇸 USD</option><option value="KES">🇰🇪 KES</option><option value="EUR">🇪🇺 EUR</option><option value="GBP">🇬🇧 GBP</option></select>
                         </div>
                         <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Amount</label>
-                            <input type="number" id="topup-amount" value="500" min="1" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-bold">
+                            <input type="number" id="topup-amount" value="500" min="0.01" step="0.01" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-bold">
                         </div>
                     </div>
-                    <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Funding Channel</label>
-                        <select id="topup-channel" onchange="toggleTopUpMpesaField()" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-semibold bg-white">
-                            <option value="mpesa">M-Pesa STK Push (Instant Mobile Prompt)</option>
-                            <option value="card">Visa Debit Card</option>
-                            <option value="bank">Linked Bank Transfer (ACH / SEPA)</option>
-                        </select>
-                    </div>
-                    <div id="topup-mpesa-box" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 space-y-2">
-                        <label class="block text-xs font-bold text-emerald-900">M-Pesa Phone Number for STK Push</label>
-                        <input type="tel" id="topup-mpesa-phone" placeholder="+254 7XX XXX XXX" class="w-full rounded-xl border border-emerald-300 bg-white px-3 py-2 text-sm font-mono">
-                        <p class="text-[11px] text-emerald-700">A Safaricom M-Pesa PIN prompt will appear to authorize this deposit.</p>
-                    </div>
-                    <button type="button" id="topup-submit-btn" onclick="processWalletTopUp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold py-3.5 rounded-xl shadow-lg">Initiate Deposit</button>
+                    <p class="text-sm text-slate-600">{{ 'Add test funds instantly to this demo wallet.' if payment_mode == 'demo' else 'Choose a payment method on Flutterwave’s test checkout. Use test details only.' }}</p>
+                    <button type="button" id="topup-submit-btn" onclick="processWalletTopUp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold py-3.5 rounded-xl shadow-lg">{{ 'Add Demo Funds' if payment_mode == 'demo' else 'Open Test Checkout' }}</button>
                 </div>
             </div>
         </div>
@@ -536,7 +499,7 @@
         <div class="flex min-h-full items-center justify-center p-4">
             <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden" id="printable-receipt-area">
                 <div class="bg-navy-900 text-white px-6 py-4 flex items-center justify-between">
-                    <h3 class="font-display font-bold text-lg">Payment Receipt</h3>
+                    <h3 class="font-display font-bold text-lg">Demo Receipt</h3>
                     <button type="button" onclick="closeReceiptModal()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20"><i data-lucide="x" class="w-4 h-4"></i></button>
                 </div>
                 <div class="p-6 space-y-3 text-sm">
@@ -557,7 +520,12 @@
 
     <!-- JAVASCRIPT -->
     <script type="module">
-        const API_BASE_URL = 'https://tinyurl.pythonanywhere.com';
+        const urls = {
+            me: {{ url_for('api_me') | tojson }},
+            topUp: {{ url_for('topup_init') | tojson }},
+        };
+        const paymentMode = {{ payment_mode | tojson }};
+        const walletDefaults = { USD: 0, KES: 0, EUR: 0, GBP: 0 };
 
         const CURRENCIES = {
             USD: { name: 'US Dollar', flag: '🇺🇸', rate: 1, country: 'US' },
@@ -580,7 +548,7 @@
 
         let appState = {
             user: { name: '', email: '', phone: '', kycTier: 1, docType: '', docNumber: '' },
-            wallets: { USD: 0, KES: 0, EUR: 0, GBP: 0 },
+            wallets: { ...walletDefaults },
             walletLogs: [],
             beneficiaries: [],
             transfers: []
@@ -592,16 +560,18 @@
         let rateLockSeconds = 299;
 
         // --- INIT ---
-        async function bootstrapApp() {
+        function bootstrapApp() {
             populateCurrencyDropdowns();
             bindCalculatorEvents();
             recalculate();
             startRateLockCountdown();
             fetchLiveFXRates(false);
+            const topUpCurrency = document.getElementById('topup-currency');
+            topUpCurrency.replaceChildren(...Object.entries(CURRENCIES).map(([code, c]) => new Option(c.flag + ' ' + code, code)));
             if (window.lucide) lucide.createIcons();
+            const saved = localStorage.getItem('swiftpay_email');
+            if (saved) { document.getElementById('auth-login-email').value = saved; doLogin(); }
         }
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootstrapApp);
-        else bootstrapApp();
 
         // --- AUTH ---
         window.switchAuthTab = function(tab) {
@@ -618,17 +588,20 @@
             const btn = document.getElementById('btn-auth-login');
             btn.disabled = true; btn.textContent = 'Signing in...';
             try {
-                const res = await fetch(`${API_BASE_URL}/api/me`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+                const res = await fetch(urls.me, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
                 const data = await res.json();
-                if (data.error) { showToast(data.error, 'error'); return; }
+                if (!res.ok) throw new Error(data.error || 'Could not open your demo profile.');
                 appState.user.name = data.name; appState.user.email = data.email;
                 localStorage.setItem('swiftpay_email', email);
                 document.getElementById('auth-gate').classList.add('hidden');
                 showToast(`Welcome back, ${data.name.split(' ')[0]}!`, 'success');
-                await syncUserWalletsFromBackend(false);
-                refreshAllUI();
-            } catch(e) { showToast('Connection error. Check your internet.', 'error'); }
-            btn.disabled = false; btn.textContent = 'Sign In & Access Wallet';
+                updateWallet(data);
+                showPaymentReturn();
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Sign In & Access Wallet';
+            }
         };
 
         window.doRegister = async function() {
@@ -640,22 +613,27 @@
             const btn = document.getElementById('btn-auth-register');
             btn.disabled = true; btn.textContent = 'Creating account...';
             try {
-                const res = await fetch(`${API_BASE_URL}/api/me`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, name }) });
+                const res = await fetch(urls.me, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, name }) });
                 const data = await res.json();
-                if (data.error) { showToast(data.error, 'error'); return; }
+                if (!res.ok) throw new Error(data.error || 'Could not open your demo profile.');
                 appState.user.name = data.name; appState.user.email = data.email; appState.user.phone = phone;
                 localStorage.setItem('swiftpay_email', email);
                 document.getElementById('auth-gate').classList.add('hidden');
                 showToast(`Account created! Welcome, ${name.split(' ')[0]}`, 'success');
-                await syncUserWalletsFromBackend(false);
-                refreshAllUI();
-            } catch(e) { showToast('Connection error. Try again.', 'error'); }
-            btn.disabled = false; btn.textContent = 'Create Account';
+                updateWallet(data);
+                showPaymentReturn();
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Create Account';
+            }
         };
 
         window.doLogout = function() {
             appState.user = { name: '', email: '', phone: '', kycTier: 1, docType: '', docNumber: '' };
-            appState.wallets = {}; appState.transfers = []; appState.beneficiaries = [];
+            appState.wallets = { ...walletDefaults }; appState.walletLogs = []; appState.transfers = []; appState.beneficiaries = [];
+            activeTrackedId = null;
+            document.getElementById('cloud-sync-status').textContent = 'Wallet server: waiting for profile';
             localStorage.removeItem('swiftpay_email');
             document.getElementById('auth-gate').classList.remove('hidden');
             document.getElementById('auth-login-email').value = '';
@@ -663,28 +641,56 @@
             refreshAllUI();
         };
 
-        (function autoLogin() {
-            const saved = localStorage.getItem('swiftpay_email');
-            if (saved) { document.getElementById('auth-login-email').value = saved; doLogin(); }
-        })();
-
         // --- BACKEND SYNC ---
-        async function syncUserWalletsFromBackend(notify = false) {
-            const syncStatusEl = document.getElementById('cloud-sync-status');
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/me`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: appState.user.email, name: appState.user.name }) });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                if (data.wallets && typeof data.wallets === 'object') {
-                    appState.wallets = { USD: 0, KES: 0, EUR: 0, GBP: 0, ...data.wallets };
-                }
-                if (syncStatusEl) syncStatusEl.textContent = `Connected • ${API_BASE_URL.replace('https://','')} (${appState.user.email})`;
-                refreshAllUI();
-                if (notify) showToast('Wallet synced!', 'success');
-            } catch(err) {
-                if (syncStatusEl) syncStatusEl.textContent = `Offline • ${appState.user.email}`;
-                if (notify) showToast('Could not reach backend.', 'error');
+        function updateWallet(data) {
+            appState.wallets = { ...walletDefaults };
+            for (const [currency, balance] of Object.entries(data.wallets || {})) {
+                if (Object.hasOwn(CURRENCIES, currency)) appState.wallets[currency] = balance;
             }
+            appState.walletLogs = data.deposits || [];
+            document.getElementById('cloud-sync-status').textContent = 'Wallet server: connected';
+            refreshAllUI();
+        }
+
+        async function syncUserWalletsFromBackend() {
+            const email = appState.user.email;
+            try {
+                const res = await fetch(urls.me, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+                if (!res.ok) throw new Error('Could not reach the wallet server.');
+                const data = await res.json();
+                if (appState.user.email === email) updateWallet(data);
+                return true;
+            } catch {
+                if (appState.user.email === email) {
+                    document.getElementById('cloud-sync-status').textContent = 'Wallet server: sync failed';
+                }
+                return false;
+            }
+        }
+
+        function showPaymentReturn() {
+            const url = new URL(location.href);
+            const status = url.searchParams.get('status');
+            if (paymentMode !== 'flutterwave-test' || !status) return;
+            if (['failed', 'cancelled'].includes(status)) {
+                showToast('Test checkout did not complete.', 'error');
+            } else {
+                showToast('Returned from test checkout. The balance updates after payment verification.');
+                pollWallet();
+            }
+            url.searchParams.delete('status');
+            history.replaceState(null, '', url);
+        }
+
+        function pollWallet() {
+            const email = appState.user.email;
+            let polls = 0;
+            async function tick() {
+                if (appState.user.email !== email || polls++ >= 24) return;
+                await syncUserWalletsFromBackend();
+                setTimeout(tick, 5000);
+            }
+            setTimeout(tick, 5000);
         }
 
         // --- UI REFRESH ---
@@ -705,7 +711,7 @@
             const logList = document.getElementById('wallet-ledger-list');
             if (strip) strip.innerHTML = Object.entries(appState.wallets).map(([c,b]) => `<span class="bg-white/10 px-2.5 py-1 rounded-lg font-mono font-semibold text-white">${CURRENCIES[c]?.flag||''} ${formatNumber(b)} <span class="text-emerald-400">${c}</span></span>`).join('');
             if (grid) grid.innerHTML = Object.entries(appState.wallets).map(([c,b]) => `<div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm hover:border-emerald-400 transition-all"><div class="flex items-center justify-between mb-4"><span class="text-2xl">${CURRENCIES[c]?.flag||'💱'}</span><span class="text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">${c} Account</span></div><div class="text-xs text-slate-500">${CURRENCIES[c]?.name||c} Balance</div><div class="font-display font-extrabold text-2xl text-navy-900 mt-1">${formatNumber(b)} ${c}</div><div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs"><button type="button" onclick="openTopUpModal('${c}')" class="font-bold text-emerald-600 hover:text-emerald-700">+ Add ${c}</button><button type="button" onclick="useWalletToSend('${c}')" class="font-semibold text-slate-600 hover:text-navy-900">Send →</button></div></div>`).join('');
-            if (logList) logList.innerHTML = appState.walletLogs.length ? appState.walletLogs.map(i => `<div class="py-3.5 flex items-center justify-between"><div><div class="font-bold text-navy-900">${i.type}</div><div class="text-xs text-slate-400">${i.id} • ${i.date}</div></div><div class="text-right"><div class="font-mono font-bold text-emerald-600">${i.amount}</div><div class="text-[11px] text-slate-500">${i.status}</div></div></div>`).join('') : '<p class="text-slate-400 text-sm py-2">No funding activity yet.</p>';
+            if (logList) logList.innerHTML = appState.walletLogs.length ? appState.walletLogs.map(i => `<div class="py-3.5 flex items-center justify-between"><div><div class="font-bold text-navy-900">Deposit</div><div class="text-xs text-slate-400">${escapeHTML(i.ref)} • ${escapeHTML(i.date)}</div></div><div class="text-right"><div class="font-mono font-bold text-emerald-600">+${formatNumber(i.amount)} ${escapeHTML(i.currency)}</div><div class="text-[11px] text-slate-500">Credited</div></div></div>`).join('') : '<p class="text-slate-400 text-sm py-2">No funding activity yet.</p>';
         }
 
         window.useWalletToSend = function(c) {
@@ -715,36 +721,43 @@
             recalculate(); switchAppView('overview'); openSendModal();
         };
 
-        window.openTopUpModal = function(c = 'USD') { document.getElementById('topup-currency').value = c; toggleTopUpMpesaField(); document.getElementById('topup-modal').classList.remove('hidden'); };
+        window.openTopUpModal = function(currency = 'USD') {
+            document.getElementById('topup-currency').value = currency;
+            document.getElementById('topup-modal').classList.remove('hidden');
+        };
         window.closeTopUpModal = function() { document.getElementById('topup-modal').classList.add('hidden'); };
-        window.toggleTopUpMpesaField = function() { document.getElementById('topup-mpesa-box').classList.toggle('hidden', document.getElementById('topup-channel').value !== 'mpesa'); };
 
         window.processWalletTopUp = async function() {
-            const curr = document.getElementById('topup-currency').value;
-            const amt = parseFloat(document.getElementById('topup-amount').value) || 0;
+            const currency = document.getElementById('topup-currency').value;
+            const amount = document.getElementById('topup-amount').value;
+            if (!(Number(amount) > 0)) { showToast('Enter a valid amount.', 'error'); return; }
             const btn = document.getElementById('topup-submit-btn');
-            if (amt <= 0) { showToast('Enter a valid amount.', 'error'); return; }
-            btn.disabled = true; btn.textContent = 'Connecting to Flutterwave...';
+            const label = btn.textContent;
+            btn.disabled = true; btn.textContent = 'Processing...';
             try {
-                const res = await fetch(`${API_BASE_URL}/api/topup/init`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: appState.user.email, name: appState.user.name, amount: amt, currency: curr }) });
+                const res = await fetch(urls.topUp, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: appState.user.email, name: appState.user.name, amount, currency }) });
                 const data = await res.json();
-                if (!res.ok || data.status !== 'ok' || !data.link) throw new Error(data.detail || data.error || 'Payment init failed');
-                appState.walletLogs.unshift({ id: data.tx_ref || ('DEP-'+Math.floor(100+Math.random()*900)), type: `Flutterwave (${curr})`, amount: `+${formatNumber(amt)} ${curr}`, date: 'Just now', status: 'Pending Payment' });
-                refreshAllUI();
-                showToast('Redirecting to secure payment...', 'success');
-                window.open(data.link, '_blank', 'noopener');
-                closeTopUpModal();
-                let polls = 0;
-                const iv = setInterval(async () => { polls++; await syncUserWalletsFromBackend(false); if (polls >= 24) clearInterval(iv); }, 5000);
-            } catch(err) { showToast(`Deposit error: ${err.message}`, 'error'); }
-            btn.disabled = false; btn.textContent = 'Initiate Deposit';
+                if (!res.ok || data.status !== 'ok') throw new Error(data.error || 'Could not add funds.');
+                if (paymentMode === 'flutterwave-test') {
+                    if (!data.link) throw new Error('Missing test checkout link.');
+                    location.assign(data.link);
+                } else {
+                    closeTopUpModal();
+                    if (await syncUserWalletsFromBackend()) showToast('Demo funds added.');
+                    else showToast('Deposit saved. Reload the page to refresh your balance.', 'error');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false; btn.textContent = label;
+            }
         };
 
         // --- RECIPIENTS ---
         function renderBeneficiariesUI() {
             const grid = document.getElementById('recipients-grid');
             if (!grid) return;
-            grid.innerHTML = appState.beneficiaries.length ? appState.beneficiaries.map(b => `<div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm hover:border-emerald-400 transition-all flex flex-col justify-between gap-4"><div class="flex items-center justify-between mb-3"><div class="w-11 h-11 rounded-2xl bg-navy-900 text-emerald-400 font-display font-bold flex items-center justify-center">${b.name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div><span class="text-xs font-bold uppercase px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">${CURRENCIES[COUNTRY_TO_CURRENCY[b.country]]?.flag||''} ${b.country}</span></div><h4 class="font-display font-bold text-lg text-navy-900">${b.name}</h4><p class="text-xs text-slate-500 mt-1">${b.detail}</p><div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2"><button type="button" onclick="quickSendToBeneficiary('${b.id}')" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold text-xs py-2.5 px-3 rounded-xl">Quick Send →</button><button type="button" onclick="deleteBeneficiary('${b.id}')" class="p-2.5 rounded-xl border border-slate-200 hover:bg-red-50 hover:text-red-600 text-slate-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>`).join('') : '<p class="text-slate-400 col-span-full">No saved recipients yet.</p>';
+            grid.innerHTML = appState.beneficiaries.length ? appState.beneficiaries.map(b => `<div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm hover:border-emerald-400 transition-all flex flex-col justify-between gap-4"><div class="flex items-center justify-between mb-3"><div class="w-11 h-11 rounded-2xl bg-navy-900 text-emerald-400 font-display font-bold flex items-center justify-center">${escapeHTML(b.name.split(' ').map(n=>n[0]).join('').slice(0,2))}</div><span class="text-xs font-bold uppercase px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">${CURRENCIES[COUNTRY_TO_CURRENCY[b.country]]?.flag||''} ${b.country}</span></div><h4 class="font-display font-bold text-lg text-navy-900">${escapeHTML(b.name)}</h4><p class="text-xs text-slate-500 mt-1">${escapeHTML(b.detail)}</p><div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2"><button type="button" onclick="quickSendToBeneficiary('${b.id}')" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold text-xs py-2.5 px-3 rounded-xl">Quick Send →</button><button type="button" onclick="deleteBeneficiary('${b.id}')" class="p-2.5 rounded-xl border border-slate-200 hover:bg-red-50 hover:text-red-600 text-slate-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>`).join('') : '<p class="text-slate-400 col-span-full">No saved recipients yet.</p>';
         }
         window.openRecipientModal = function() { document.getElementById('recipient-modal').classList.remove('hidden'); };
         window.closeRecipientModal = function() { document.getElementById('recipient-modal').classList.add('hidden'); };
@@ -776,7 +789,7 @@
             modalState.method = calcState.method;
             modalState.country = CURRENCIES[calcState.receiveCurrency]?.country || 'KE';
             const ss = document.getElementById('modal-saved-recipient-select');
-            ss.innerHTML = '<option value="">-- Enter Manually --</option>' + appState.beneficiaries.map(b=>`<option value="${b.id}">${b.name} (${b.detail})</option>`).join('');
+            ss.innerHTML = '<option value="">-- Enter Manually --</option>' + appState.beneficiaries.map(b=>`<option value="${b.id}">${escapeHTML(b.name)} (${escapeHTML(b.detail)})</option>`).join('');
             document.getElementById('modal-country').value = modalState.country;
             selectModalMethod(modalState.method);
             updateModalSummaryHeader(); goToModalStep(1);
@@ -917,9 +930,9 @@
             document.getElementById('receipt-amount').textContent = `${formatNumber(calcState.receiveAmount)} ${calcState.receiveCurrency}`;
             document.getElementById('receipt-eta').textContent = DELIVERY_CONFIG[calcState.method].eta;
             btn.disabled = false;
-            btn.innerHTML = '<i data-lucide="lock" class="w-4 h-4"></i><span>Confirm & Send Now</span>';
+            btn.innerHTML = '<i data-lucide="lock" class="w-4 h-4"></i><span>Simulate Transfer</span>';
             refreshAllUI(); goToModalStep(4);
-            showToast(`Transfer #${newId} dispatched!`, 'success');
+            showToast(`Simulated transfer #${newId} created.`, 'success');
         };
 
         window.trackNewTransferFromReceipt = function() { closeSendModal(); switchAppView('overview'); document.getElementById('tracker-dashboard')?.scrollIntoView({behavior:'smooth'}); };
@@ -933,7 +946,7 @@
             listEl.innerHTML = appState.transfers.slice(0,5).map(tx => {
                 const sel = tx.id === activeTrackedId;
                 const del = tx.statusStep >= 3;
-                return `<div onclick="selectTrackedTransfer('${tx.id}')" class="p-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${sel?'bg-emerald-50/70':'hover:bg-slate-50'}"><div class="flex items-start sm:items-center gap-4"><div class="w-11 h-11 rounded-2xl flex items-center justify-center font-display font-bold text-sm shrink-0 ${sel?'bg-navy-900 text-emerald-400':'bg-slate-100 text-navy-900'}">${tx.recipient.split(' ').map(n=>n[0]).join('').slice(0,2)}</div><div><div class="flex items-center gap-2 flex-wrap"><span class="font-bold text-navy-900 text-sm">${tx.recipient}</span><span class="text-xs font-mono text-slate-400">#${tx.id}</span></div><div class="text-xs text-slate-500 mt-0.5">${tx.methodLabel} • ${tx.date}</div></div></div><div class="flex sm:flex-col items-center sm:items-end justify-between gap-1"><div class="font-display font-bold text-sm text-navy-900">${tx.receiveAmount}</div><div class="flex items-center gap-2"><span class="text-xs text-slate-400">${tx.sendAmount}</span><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${del?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}"><span class="w-1.5 h-1.5 rounded-full ${del?'bg-emerald-600':'bg-amber-500 animate-pulse'}"></span>${del?'Delivered':'Settling'}</span></div></div></div>`;
+                return `<div onclick="selectTrackedTransfer('${tx.id}')" class="p-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${sel?'bg-emerald-50/70':'hover:bg-slate-50'}"><div class="flex items-start sm:items-center gap-4"><div class="w-11 h-11 rounded-2xl flex items-center justify-center font-display font-bold text-sm shrink-0 ${sel?'bg-navy-900 text-emerald-400':'bg-slate-100 text-navy-900'}">${escapeHTML(tx.recipient.split(' ').map(n=>n[0]).join('').slice(0,2))}</div><div><div class="flex items-center gap-2 flex-wrap"><span class="font-bold text-navy-900 text-sm">${escapeHTML(tx.recipient)}</span><span class="text-xs font-mono text-slate-400">#${tx.id}</span></div><div class="text-xs text-slate-500 mt-0.5">${tx.methodLabel} • ${tx.date}</div></div></div><div class="flex sm:flex-col items-center sm:items-end justify-between gap-1"><div class="font-display font-bold text-sm text-navy-900">${tx.receiveAmount}</div><div class="flex items-center gap-2"><span class="text-xs text-slate-400">${tx.sendAmount}</span><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${del?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}"><span class="w-1.5 h-1.5 rounded-full ${del?'bg-emerald-600':'bg-amber-500 animate-pulse'}"></span>${del?'Delivered':'Settling'}</span></div></div></div>`;
             }).join('') || '<p class="p-6 text-slate-400 text-sm">No transfers yet.</p>';
         }
 
@@ -961,7 +974,7 @@
                 return `<div class="relative"><div class="absolute -left-7 top-0.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${done?'bg-emerald-500 text-navy-950':'bg-navy-800 border border-white/25 text-slate-400'}">${done?'✓':i+1}</div><div class="text-sm font-semibold ${done?'text-white':'text-slate-400'} flex items-center gap-2"><span>${s.title}</span>${cur?'<span class="text-[10px] uppercase tracking-wider bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded">Active</span>':''}</div><div class="text-xs text-slate-400 mt-0.5">${s.desc}</div></div>`;
             }).join('');
             const logBox = document.getElementById('tracker-webhook-log');
-            if (logBox) { logBox.innerHTML = (tx.webhookLogs||[]).map(l=>`<div>${l}</div>`).join(''); logBox.scrollTop = logBox.scrollHeight; }
+            if (logBox) { logBox.innerHTML = (tx.webhookLogs||[]).map(l=>`<div>${escapeHTML(l)}</div>`).join(''); logBox.scrollTop = logBox.scrollHeight; }
             const advBtn = document.getElementById('advance-status-btn');
             advBtn.disabled = del;
             advBtn.textContent = del ? 'Settled ✓' : 'Force Next Webhook →';
@@ -1000,7 +1013,7 @@
             });
             tbody.innerHTML = filtered.map(tx => {
                 const del = tx.statusStep >= 3;
-                return `<tr class="hover:bg-slate-50 transition-colors"><td class="py-4 px-5"><div class="font-mono font-bold text-navy-900">#${tx.id}</div><div class="text-xs text-slate-400">${tx.date}</div></td><td class="py-4 px-5"><div class="font-bold text-navy-900">${tx.recipient}</div><div class="text-xs text-slate-500">${tx.methodLabel} (${tx.detail})</div></td><td class="py-4 px-5 font-semibold text-slate-700">${tx.sendAmount}</td><td class="py-4 px-5 font-display font-bold text-emerald-700">${tx.receiveAmount}</td><td class="py-4 px-5"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${del?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}">${del?'Delivered':'In Progress'}</span></td><td class="py-4 px-5 text-right space-x-1.5"><button type="button" onclick="openPrintableReceipt('${tx.id}')" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-xs font-bold text-navy-900">Receipt</button><button type="button" onclick="repeatTransfer('${tx.id}')" class="px-3 py-1.5 rounded-lg bg-navy-900 hover:bg-navy-800 text-xs font-bold text-white">Repeat</button></td></tr>`;
+                return `<tr class="hover:bg-slate-50 transition-colors"><td class="py-4 px-5"><div class="font-mono font-bold text-navy-900">#${tx.id}</div><div class="text-xs text-slate-400">${tx.date}</div></td><td class="py-4 px-5"><div class="font-bold text-navy-900">${escapeHTML(tx.recipient)}</div><div class="text-xs text-slate-500">${tx.methodLabel} (${escapeHTML(tx.detail)})</div></td><td class="py-4 px-5 font-semibold text-slate-700">${tx.sendAmount}</td><td class="py-4 px-5 font-display font-bold text-emerald-700">${tx.receiveAmount}</td><td class="py-4 px-5"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${del?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}">${del?'Delivered':'In Progress'}</span></td><td class="py-4 px-5 text-right space-x-1.5"><button type="button" onclick="openPrintableReceipt('${tx.id}')" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-xs font-bold text-navy-900">Receipt</button><button type="button" onclick="repeatTransfer('${tx.id}')" class="px-3 py-1.5 rounded-lg bg-navy-900 hover:bg-navy-800 text-xs font-bold text-white">Repeat</button></td></tr>`;
             }).join('');
         };
 
@@ -1017,8 +1030,12 @@
 
         window.exportTransactionsCSV = function() {
             const headers = ['ID','Date','Recipient','Channel','Sent','Payout','Status'];
-            const rows = appState.transfers.map(t=>[t.id,t.date,`"${t.recipient}"`,`"${t.methodLabel}"`,`"${t.sendAmount}"`,`"${t.receiveAmount}"`,t.statusStep>=3?'Delivered':'In Progress']);
-            const csv = [headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+            const rows = appState.transfers.map(t=>[t.id,t.date,t.recipient,t.methodLabel,t.sendAmount,t.receiveAmount,t.statusStep>=3?'Delivered':'In Progress']);
+            const csvCell = value => {
+                const text = /^[\s]*[=+@-]/.test(value) ? "'" + value : value;
+                return '"' + text.replaceAll('"', '""') + '"';
+            };
+            const csv = [headers, ...rows].map(row => row.map(csvCell).join(',')).join('\n');
             const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
             a.download = `SwiftPay_Statement_${new Date().toISOString().slice(0,10)}.csv`; a.click();
@@ -1064,7 +1081,7 @@
         window.sendMockOTP = function() {
             const code = Math.floor(100000 + Math.random()*900000);
             document.getElementById('kyc-otp-input').value = code;
-            showToast(`OTP sent: ${code}`, 'success');
+            showToast(`Sample verification code: ${code}`, 'success');
         };
         window.verifyTier1OTP = function() {
             const v = document.getElementById('kyc-otp-input').value.trim();
@@ -1102,7 +1119,7 @@
         window.fetchLiveFXRates = async function(notify = false) {
             const statusEl = document.getElementById('fx-api-status');
             try {
-                const res = await fetch('https://open.er-api.com/v6/latest/USD');
+                const res = await fetch('https://open.er-api.com/v6/latest/USD', { signal: AbortSignal.timeout(5000) });
                 if (!res.ok) throw new Error('FX unavailable');
                 const data = await res.json();
                 if (data && data.rates) {
@@ -1133,7 +1150,11 @@
             const rs = document.getElementById('receive-currency');
             if (!ss || !rs) return;
             ss.innerHTML = ''; rs.innerHTML = '';
-            Object.values(CURRENCIES).forEach(c => { ss.add(new Option(`${c.flag} ${c.code}`, c.code)); rs.add(new Option(`${c.flag} ${c.code}`, c.code)); });
+            for (const [code, currency] of Object.entries(CURRENCIES)) {
+                const label = `${currency.flag} ${code}`;
+                ss.add(new Option(label, code));
+                rs.add(new Option(label, code));
+            }
             ss.value = calcState.sendCurrency; rs.value = calcState.receiveCurrency;
         }
 
@@ -1191,6 +1212,12 @@
         }
 
         // --- UTILS ---
+        function escapeHTML(value) {
+            return String(value).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[c]);
+        }
+
         function formatNumber(n) { return Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
         window.copyTrackingId = function() {
@@ -1203,11 +1230,12 @@
             const c = document.getElementById('toast-container');
             const t = document.createElement('div');
             t.className = `${type==='error'?'bg-red-600 text-white':'bg-navy-900 text-white border border-emerald-500/40'} px-4 py-3 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2.5 pointer-events-auto transition-all duration-300`;
-            t.innerHTML = `<span class="w-2 h-2 rounded-full ${type==='error'?'bg-white':'bg-emerald-400'}"></span><span>${msg}</span>`;
+            t.textContent = msg;
             c.appendChild(t);
             setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3400);
         }
+
+        bootstrapApp();
     </script>
 </body>
 </html>
-HTMLEOF
