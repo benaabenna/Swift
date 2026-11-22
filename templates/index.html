@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftPay Global — International Money Transfer & Multi-Currency Wallet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: { 950: '#061021', 900: '#0A192F', 800: '#112240', 700: '#1D3557' },
+                        emerald: { 400: '#34D399', 500: '#10B981', 600: '#059669', 700: '#047857' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #printable-receipt-area, #printable-receipt-area * { visibility: visible; }
+            #printable-receipt-area { position: fixed; left: 0; top: 0; width: 100%; background: white; padding: 2rem; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- AUTH GATE -->
+    <div id="auth-gate" class="fixed inset-0 z-[100] bg-navy-950 flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/30 mb-4">
+                    <i data-lucide="send" class="w-8 h-8 text-navy-950 stroke-[2.5]"></i>
+                </div>
+                <h1 class="font-display font-extrabold text-3xl text-white">Swift<span class="text-emerald-400">Pay</span></h1>
+                <p class="text-slate-400 text-sm mt-2">International Money Transfer & Multi-Currency Wallet</p>
+            </div>
+            <div class="bg-navy-900 rounded-3xl border border-white/10 p-6 sm:p-8 shadow-2xl">
+                <div class="flex bg-navy-950 rounded-xl p-1 mb-6">
+                    <button type="button" id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 rounded-lg text-sm font-bold bg-emerald-500 text-navy-950 transition-all">Sign In</button>
+                    <button type="button" id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-400 transition-all">Register</button>
+                </div>
+                <div id="auth-login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Email</label>
+                        <input type="email" id="auth-login-email" placeholder="you@example.com" class="w-full rounded-xl border border-white/10 bg-navy-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <button type="button" id="btn-auth-login" onclick="doLogin()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-navy-950 font-bold text-sm py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 transition-all">Sign In & Access Wallet</button>
+                    <p class="text-center text-xs text-slate-500">Tier 1: $2,500/day &bull; Tier 2 (KYC): $50,000/day</p>
+                </div>
+                <div id="auth-register-form" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Full Name</label>
+                        <input type="text" id="auth-reg-name" placeholder="e.g. Bena Kiprop" class="w-full rounded-xl border border-white/10 bg-navy-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Email</label>
+                        <input type="email" id="auth-reg-email" placeholder="you@example.com" class="w-full rounded-xl border border-white/10 bg-navy-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Phone Number</label>
+                        <input type="tel" id="auth-reg-phone" placeholder="+254 7XX XXX XXX" class="w-full rounded-xl border border-white/10 bg-navy-950 px-4 py-3 text-sm text-white placeholder-slate-500 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <button type="button" id="btn-auth-register" onclick="doRegister()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-navy-950 font-bold text-sm py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 transition-all">Create Account</button>
+                    <p class="text-center text-xs text-slate-500">By registering you agree to our Terms & Privacy Policy</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-[70] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 bg-navy-900/95 backdrop-blur-md border-b border-white/10 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <a href="#" onclick="switchAppView('overview'); return false;" class="flex items-center gap-2.5 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                        <i data-lucide="send" class="w-5 h-5 text-navy-950 stroke-[2.5]"></i>
+                    </div>
+                    <div>
+                        <span class="font-display font-extrabold text-xl tracking-tight text-white">Swift<span class="text-emerald-400">Pay</span></span>
+                        <span class="hidden sm:inline-block ml-1.5 text-[10px] font-semibold uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">Live Platform</span>
+                    </div>
+                </a>
+                <nav class="hidden lg:flex items-center gap-1.5 bg-navy-950/70 p-1.5 rounded-2xl border border-white/10 text-xs font-semibold">
+                    <button type="button" data-view="overview" onclick="switchAppView('overview')" class="nav-tab-btn px-3.5 py-2 rounded-xl bg-emerald-500 text-navy-950 transition-all">Send & Overview</button>
+                    <button type="button" data-view="wallet" onclick="switchAppView('wallet')" class="nav-tab-btn px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition-all">Multi-Currency Wallet</button>
+                    <button type="button" data-view="recipients" onclick="switchAppView('recipients')" class="nav-tab-btn px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition-all">Recipients</button>
+                    <button type="button" data-view="ledger" onclick="switchAppView('ledger')" class="nav-tab-btn px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition-all">Activity & Webhooks</button>
+                    <button type="button" data-view="kyc" onclick="switchAppView('kyc')" class="nav-tab-btn px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+                        <span>Security & KYC</span>
+                        <span id="nav-kyc-badge" class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px]">Tier 1</span>
+                    </button>
+                </nav>
+                <div class="flex items-center gap-2.5">
+                    <button onclick="doLogout()" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 px-3 py-2 rounded-xl text-xs font-medium text-slate-200 transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span id="header-user-name">—</span>
+                        <span id="header-kyc-pill" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Tier 1</span>
+                        <i data-lucide="log-out" class="w-3.5 h-3.5 ml-1 text-slate-400"></i>
+                    </button>
+                    <button onclick="openSendModal()" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-navy-950 font-semibold text-sm px-4 sm:px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95">
+                        <span>Send Money</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex lg:hidden items-center gap-2 pb-3 overflow-x-auto text-xs font-semibold">
+                <button type="button" data-view="overview" onclick="switchAppView('overview')" class="nav-tab-btn shrink-0 px-3 py-1.5 rounded-lg bg-emerald-500 text-navy-950">Send & Overview</button>
+                <button type="button" data-view="wallet" onclick="switchAppView('wallet')" class="nav-tab-btn shrink-0 px-3 py-1.5 rounded-lg bg-white/10 text-slate-200">Wallet</button>
+                <button type="button" data-view="recipients" onclick="switchAppView('recipients')" class="nav-tab-btn shrink-0 px-3 py-1.5 rounded-lg bg-white/10 text-slate-200">Recipients</button>
+                <button type="button" data-view="ledger" onclick="switchAppView('ledger')" class="nav-tab-btn shrink-0 px-3 py-1.5 rounded-lg bg-white/10 text-slate-200">Ledger</button>
+                <button type="button" data-view="kyc" onclick="switchAppView('kyc')" class="nav-tab-btn shrink-0 px-3 py-1.5 rounded-lg bg-white/10 text-slate-200">KYC & Account</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- WALLET STRIP -->
+    <div class="bg-navy-950 text-white border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-3 flex-wrap">
+                <span class="text-slate-400 font-semibold uppercase tracking-wider">Wallet Balances:</span>
+                <div id="top-wallet-strip" class="flex items-center gap-2 flex-wrap"></div>
+                <button type="button" onclick="openTopUpModal()" class="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-semibold bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg transition-colors">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Funds
+                </button>
+            </div>
+            <div class="flex items-center gap-3 text-slate-400">
+                <span id="fx-api-status" class="inline-flex items-center gap-1.5 text-emerald-400">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Connecting live FX feed...
+                </span>
+                <span>&bull;</span>
+                <span id="daily-limit-indicator">Daily Limit: $2,500 (Tier 1)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 1: OVERVIEW -->
+    <main id="view-overview" class="app-view">
+        <section class="relative bg-navy-900 text-white pt-10 pb-20 lg:pt-14 lg:pb-24 overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-0 left-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+                    <div class="lg:col-span-6 space-y-6">
+                        <div class="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5 text-xs font-semibold text-emerald-300">
+                            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                            <span>Instant M-Pesa, Bank & Cash Payouts in 140+ Countries</span>
+                        </div>
+                        <h1 class="font-display text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                            Send money globally at the <span class="text-emerald-400">real exchange rate.</span>
+                        </h1>
+                        <p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl">
+                            Zero hidden markups, instant mobile wallet delivery, and bank-grade 256-bit security. Lock in live mid-market FX rates for 5 minutes and track every transfer in real time.
+                        </p>
+                        <div class="grid grid-cols-3 gap-4 pt-2 border-t border-white/10">
+                            <div><div class="font-display font-extrabold text-xl sm:text-2xl text-white">&lt; 2 mins</div><div class="text-xs text-slate-400">M-Pesa & Wallet Speed</div></div>
+                            <div><div class="font-display font-extrabold text-xl sm:text-2xl text-emerald-400">0% Markup</div><div class="text-xs text-slate-400">Mid-Market FX Rates</div></div>
+                            <div><div class="font-display font-extrabold text-xl sm:text-2xl text-white">256-Bit</div><div class="text-xs text-slate-400">TLS & PCI-DSS Level 1</div></div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-6">
+                        <div class="bg-white text-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200/80">
+                            <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="relative flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
+                                    <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Live Mid-Market Rate</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="fetchLiveFXRates(true)" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-navy-900 transition-colors"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i></button>
+                                    <span id="rate-timer" class="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">Lock: 04:59</span>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+                                    <div class="flex items-center justify-between text-xs font-semibold text-slate-500 mb-1"><label>You Send</label><span>Balance / Limit Ready</span></div>
+                                    <div class="flex items-center justify-between gap-3">
+                                        <input type="number" id="send-amount" value="500" min="1" step="any" class="w-full bg-transparent font-display text-2xl sm:text-3xl font-extrabold text-navy-900 focus:outline-none">
+                                        <select id="send-currency" class="shrink-0 rounded-xl bg-navy-900 text-white font-bold text-sm px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                                            <option value="USD">🇺🇸 USD</option><option value="EUR">🇪🇺 EUR</option><option value="GBP">🇬🇧 GBP</option><option value="KES">🇰🇪 KES</option><option value="NGN">🇳🇬 NGN</option><option value="INR">🇮🇳 INR</option><option value="CAD">🇨🇦 CAD</option><option value="AUD">🇦🇺 AUD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="relative pl-6 py-1 space-y-2.5 text-xs sm:text-sm text-slate-600 border-l-2 border-slate-200 ml-4">
+                                    <button type="button" id="swap-currencies-btn" class="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm hover:border-emerald-500 hover:text-emerald-600 flex items-center justify-center transition-all"><i data-lucide="arrow-up-down" class="w-3.5 h-3.5"></i></button>
+                                    <div class="flex items-center justify-between"><span>Transfer Fee</span><span id="calc-fee" class="font-bold text-navy-900">4.74 USD</span></div>
+                                    <div class="flex items-center justify-between"><span>Amount Converted</span><span id="calc-net-amount" class="font-semibold text-slate-800">495.26 USD</span></div>
+                                    <div class="flex items-center justify-between"><span class="flex items-center gap-1.5">Guaranteed Rate <span id="calc-savings" class="text-[11px] font-semibold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full">Save ~$18.00 vs banks</span></span><span id="calc-rate-display" class="font-bold text-emerald-700">1 USD = 129.50 KES</span></div>
+                                </div>
+                                <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+                                    <div class="flex items-center justify-between text-xs font-semibold text-slate-500 mb-1"><label>Recipient Gets</label><span id="calc-eta" class="text-emerald-700 font-bold">Within 2 minutes</span></div>
+                                    <div class="flex items-center justify-between gap-3">
+                                        <input type="number" id="receive-amount" value="64136.17" min="0" step="any" class="w-full bg-transparent font-display text-2xl sm:text-3xl font-extrabold text-emerald-600 focus:outline-none">
+                                        <select id="receive-currency" class="shrink-0 rounded-xl bg-navy-900 text-white font-bold text-sm px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                                            <option value="KES">🇰🇪 KES</option><option value="USD">🇺🇸 USD</option><option value="EUR">🇪🇺 EUR</option><option value="GBP">🇬🇧 GBP</option><option value="NGN">🇳🇬 NGN</option><option value="INR">🇮🇳 INR</option><option value="CAD">🇨🇦 CAD</option><option value="AUD">🇦🇺 AUD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Payout Method</label>
+                                    <select id="calc-delivery-method" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                        <option value="mobile">📱 Mobile Money (M-Pesa / Airtel / MoMo)</option>
+                                        <option value="bank">🏦 Bank Transfer (SWIFT / ACH / SEPA / NIP)</option>
+                                        <option value="cash">💵 Instant Cash Pickup</option>
+                                    </select>
+                                </div>
+                                <button type="button" onclick="openSendModal()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-navy-950 font-display font-bold text-base py-4 rounded-2xl shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.99] flex items-center justify-center gap-2">
+                                    <span>Continue to Send Money</span><i data-lucide="arrow-right" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECENT TRANSFERS -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20 pb-16">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 shadow-xl overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                        <div><h2 class="font-display font-bold text-lg text-navy-900">Recent Transfers</h2><p class="text-xs text-slate-500">Click any transaction to inspect live settlement telemetry</p></div>
+                        <span id="transfer-count-label" class="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-full">0 Transactions</span>
+                    </div>
+                    <div id="recent-transfers-list" class="divide-y divide-slate-100"></div>
+                </div>
+                <div class="lg:col-span-5 bg-navy-900 text-white rounded-3xl p-6 sm:p-7 shadow-xl border border-white/10 flex flex-col justify-between gap-6">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 pb-4 border-b border-white/10">
+                            <div>
+                                <span class="text-[11px] uppercase tracking-wider text-slate-400 block">Live Tracking ID</span>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span id="tracker-id" class="font-mono font-bold text-lg text-emerald-400">#—</span>
+                                    <button type="button" onclick="copyTrackingId()" class="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                </div>
+                            </div>
+                            <span id="tracker-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> No Active Transfer</span>
+                        </div>
+                        <div class="mt-4 bg-white/5 rounded-2xl p-4 space-y-2 text-xs">
+                            <div class="flex justify-between"><span class="text-slate-400">Beneficiary</span><span id="tracker-recipient" class="font-semibold text-white">—</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Amount Sent</span><span id="tracker-sent" class="font-semibold text-slate-200">—</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Payout Amount</span><span id="tracker-received" class="font-display font-bold text-sm text-emerald-400">—</span></div>
+                        </div>
+                        <div id="tracker-steps" class="relative pl-7 mt-5 space-y-4"></div>
+                    </div>
+                    <div class="space-y-3">
+                        <div id="tracker-webhook-log" class="bg-navy-950 rounded-xl p-3 font-mono text-[11px] text-emerald-300/90 max-h-24 overflow-y-auto space-y-1 border border-white/10"></div>
+                        <div class="flex items-center justify-between gap-2">
+                            <button type="button" onclick="openPrintableReceipt(activeTrackedId)" class="text-xs font-semibold bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-xl transition-colors">View Receipt</button>
+                            <button type="button" id="advance-status-btn" onclick="advanceActiveTransfer()" class="text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-navy-950 px-3.5 py-2 rounded-xl transition-colors">Force Next Webhook →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 space-y-16">
+            <div class="text-center max-w-2xl mx-auto space-y-3">
+                <span class="text-xs font-bold uppercase tracking-widest text-emerald-600">How SwiftPay Works</span>
+                <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-navy-900">Three simple steps to send money worldwide</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-3xl p-7 border border-slate-200/80 shadow-sm"><div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 font-display font-extrabold text-lg flex items-center justify-center mb-4">1</div><h3 class="font-display font-bold text-lg text-navy-900 mb-2">Lock Your Exchange Rate</h3><p class="text-sm text-slate-600 leading-relaxed">Enter your amount and choose from 8+ major currencies with live interbank rates and transparent upfront fees.</p></div>
+                <div class="bg-white rounded-3xl p-7 border border-slate-200/80 shadow-sm"><div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 font-display font-extrabold text-lg flex items-center justify-center mb-4">2</div><h3 class="font-display font-bold text-lg text-navy-900 mb-2">Select Payout Channel</h3><p class="text-sm text-slate-600 leading-relaxed">Send directly to Safaricom M-Pesa, Airtel Money, local bank accounts, or instant cash pickup branches.</p></div>
+                <div class="bg-white rounded-3xl p-7 border border-slate-200/80 shadow-sm"><div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 font-display font-extrabold text-lg flex items-center justify-center mb-4">3</div><h3 class="font-display font-bold text-lg text-navy-900 mb-2">Fund & Track Live</h3><p class="text-sm text-slate-600 leading-relaxed">Pay using your SwiftPay Multi-Currency Wallet, M-Pesa STK Push, debit card, or linked bank account.</p></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- VIEW 2: WALLET -->
+    <section id="view-wallet" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div><h2 class="font-display text-2xl sm:text-3xl font-extrabold text-navy-900">Multi-Currency Wallets</h2><p class="text-sm text-slate-500">Hold, top up via M-Pesa STK Push or Card, and send funds instantly with zero conversion delay.</p></div>
+            <button type="button" onclick="openTopUpModal()" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold text-sm px-5 py-3 rounded-xl shadow-md"><i data-lucide="plus" class="w-4 h-4"></i> Add Funds / M-Pesa Top Up</button>
+        </div>
+        <div id="wallet-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+        <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+            <h3 class="font-display font-bold text-lg text-navy-900 mb-3">Recent Wallet Funding Activity</h3>
+            <div id="wallet-ledger-list" class="divide-y divide-slate-100 text-sm"></div>
+        </div>
+    </section>
+
+    <!-- VIEW 3: RECIPIENTS -->
+    <section id="view-recipients" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div><h2 class="font-display text-2xl sm:text-3xl font-extrabold text-navy-900">Saved Recipients</h2><p class="text-sm text-slate-500">One-click repeat transfers to family, suppliers, and mobile wallets worldwide.</p></div>
+            <button type="button" onclick="openRecipientModal()" class="inline-flex items-center gap-2 bg-navy-900 hover:bg-navy-800 text-white font-bold text-sm px-5 py-3 rounded-xl"><i data-lucide="user-plus" class="w-4 h-4"></i> Add New Recipient</button>
+        </div>
+        <div id="recipients-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </section>
+
+    <!-- VIEW 4: LEDGER -->
+    <section id="view-ledger" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div><h2 class="font-display text-2xl sm:text-3xl font-extrabold text-navy-900">Transaction Ledger & Statements</h2><p class="text-sm text-slate-500">Audit all international transfers, download official PDF receipts, or export CSV statements.</p></div>
+            <button type="button" onclick="exportTransactionsCSV()" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold text-sm px-4 py-2.5 rounded-xl"><i data-lucide="download" class="w-4 h-4"></i> Export CSV Statement</button>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row gap-3">
+                <input type="text" id="ledger-search-input" oninput="renderFullLedger()" placeholder="Search recipient, #SWP ID, or currency..." class="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <select id="ledger-status-filter" onchange="renderFullLedger()" class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold bg-white">
+                    <option value="all">All Statuses</option><option value="delivered">Delivered</option><option value="active">In Progress</option>
+                </select>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200">
+                        <tr><th class="py-3.5 px-5">Reference / Date</th><th class="py-3.5 px-5">Recipient & Channel</th><th class="py-3.5 px-5">Sent</th><th class="py-3.5 px-5">Delivered</th><th class="py-3.5 px-5">Status</th><th class="py-3.5 px-5 text-right">Actions</th></tr>
+                    </thead>
+                    <tbody id="full-ledger-tbody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIEW 5: KYC -->
+    <section id="view-kyc" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+        <div class="bg-navy-900 text-white rounded-3xl p-6 sm:p-8 flex flex-wrap items-center justify-between gap-6">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-400" id="kyc-profile-tier-label">Tier 1 Verified</span>
+                <h2 class="font-display text-2xl font-extrabold mt-1" id="kyc-profile-name">—</h2>
+                <p class="text-sm text-slate-300 mt-1" id="kyc-profile-contact">—</p>
+            </div>
+            <div class="bg-white/10 rounded-2xl px-5 py-4 border border-white/15">
+                <div class="text-xs text-slate-300">Current Daily Sending Limit</div>
+                <div class="font-display text-2xl font-extrabold text-emerald-400" id="kyc-profile-limit">$2,500.00 / day</div>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-display font-bold text-lg text-navy-900">Tier 1: Phone & Email OTP Verification</h3>
+                    <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Active</span>
+                </div>
+                <p class="text-sm text-slate-600">Enables international transfers up to $2,500/day with instant M-Pesa and bank payouts.</p>
+                <div class="flex gap-2">
+                    <input type="text" id="kyc-otp-input" placeholder="6-digit OTP" class="flex-1 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-mono">
+                    <button type="button" onclick="sendMockOTP()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-navy-900">Send OTP</button>
+                    <button type="button" onclick="verifyTier1OTP()" class="px-4 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-800 text-xs font-bold text-white">Verify</button>
+                </div>
+            </div>
+            <div id="tier2-card" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-display font-bold text-lg text-navy-900">Tier 2: Government ID / Passport KYC</h3>
+                    <span id="tier2-status-badge" class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Upgrade to $50k/day</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <select id="kyc-doc-type" class="rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-semibold bg-white">
+                        <option value="National ID">National ID Card</option><option value="Passport">International Passport</option><option value="Drivers License">Driver's License</option>
+                    </select>
+                    <input type="text" id="kyc-doc-number" placeholder="Document Number (e.g. A12345678)" class="rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-mono">
+                </div>
+                <label class="block border-2 border-dashed border-slate-300 rounded-2xl p-4 text-center cursor-pointer hover:border-emerald-500 transition-colors">
+                    <input type="file" class="hidden" onchange="handleKYCDocPreview(this)">
+                    <span id="kyc-file-label" class="text-xs font-semibold text-slate-600">Click to attach front/back ID scan (JPG, PNG, PDF)</span>
+                </label>
+                <button type="button" id="submit-tier2-btn" onclick="submitTier2KYC()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold text-sm py-3 rounded-xl">Submit Identity Verification</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-navy-950 text-slate-400 border-t border-white/10 py-10 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+            <div class="flex items-center gap-2"><span class="font-display font-bold text-white text-base">Swift<span class="text-emerald-400">Pay</span> Global</span><span>&bull; Licensed Remittance & FX Infrastructure</span></div>
+            <div id="cloud-sync-status" class="font-mono text-emerald-400/90">Backend: tinyurl.pythonanywhere.com</div>
+        </div>
+    </footer>
+
+    <!-- SEND MONEY MODAL -->
+    <div id="send-money-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="fixed inset-0 bg-navy-950/80 backdrop-blur-sm" onclick="closeSendModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+                <div class="bg-navy-900 text-white px-6 py-5">
+                    <div class="flex items-center justify-between">
+                        <div><h3 class="font-display font-bold text-lg" id="modal-summary-header">—</h3><p class="text-xs text-slate-300 mt-0.5" id="modal-subtitle">Step 1 of 3 • Delivery Method & Destination</p></div>
+                        <button type="button" onclick="closeSendModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+                    <div class="w-full h-1.5 bg-white/10 rounded-full mt-4 overflow-hidden"><div id="modal-progress-bar" class="h-full bg-emerald-400 transition-all duration-300" style="width:33.33%"></div></div>
+                </div>
+                <div id="modal-step-1" class="p-6 space-y-5">
+                    <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Destination Country</label>
+                        <select id="modal-country" class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="KE">🇰🇪 Kenya (KES)</option><option value="NG">🇳🇬 Nigeria (NGN)</option><option value="IN">🇮🇳 India (INR)</option><option value="GB">🇬🇧 United Kingdom (GBP)</option><option value="EU">🇪🇺 European Union (EUR)</option><option value="US">🇺🇸 United States (USD)</option><option value="CA">🇨🇦 Canada (CAD)</option><option value="AU">🇦🇺 Australia (AUD)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Choose Delivery Channel</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <button type="button" data-method="mobile" onclick="selectModalMethod('mobile')" class="method-card text-left p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 transition-all"><div class="text-xl mb-1">📱</div><div class="font-bold text-sm text-navy-900">Mobile Money</div><div class="text-[11px] text-slate-500 mt-0.5">M-Pesa / MoMo</div></button>
+                            <button type="button" data-method="bank" onclick="selectModalMethod('bank')" class="method-card text-left p-4 rounded-2xl border-2 border-slate-200 hover:border-slate-300 transition-all"><div class="text-xl mb-1">🏦</div><div class="font-bold text-sm text-navy-900">Bank Transfer</div><div class="text-[11px] text-slate-500 mt-0.5">SWIFT / Local</div></button>
+                            <button type="button" data-method="cash" onclick="selectModalMethod('cash')" class="method-card text-left p-4 rounded-2xl border-2 border-slate-200 hover:border-slate-300 transition-all"><div class="text-xl mb-1">💵</div><div class="font-bold text-sm text-navy-900">Cash Pickup</div><div class="text-[11px] text-slate-500 mt-0.5">Agent Branches</div></button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="goToModalStep(2)" class="w-full bg-navy-900 hover:bg-navy-800 text-white font-bold text-sm py-3.5 rounded-xl transition-colors">Continue to Recipient Details →</button>
+                </div>
+                <div id="modal-step-2" class="hidden p-6 space-y-4">
+                    <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Autofill from Saved Recipients</label>
+                        <select id="modal-saved-recipient-select" onchange="autofillRecipientFromSaved(this.value)" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium bg-slate-50"><option value="">-- Enter Manually --</option></select>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">First Name</label><input type="text" id="rec-first-name" placeholder="e.g. Amina" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"></div>
+                        <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Last Name</label><input type="text" id="rec-last-name" placeholder="e.g. Wanjiku" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"></div>
+                    </div>
+                    <div id="dynamic-recipient-fields" class="space-y-3"></div>
+                    <p id="step-2-error" class="hidden text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2"></p>
+                    <div class="flex items-center justify-between gap-3 pt-2">
+                        <button type="button" onclick="goToModalStep(1)" class="px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold text-slate-700 hover:bg-slate-50">← Back</button>
+                        <button type="button" onclick="validateAndGoToStep3()" class="flex-1 bg-navy-900 hover:bg-navy-800 text-white font-bold text-sm py-3 rounded-xl">Review & Pay →</button>
+                    </div>
+                </div>
+                <div id="modal-step-3" class="hidden p-6 space-y-4">
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-slate-500">Recipient</span><span id="rev-recipient-name" class="font-bold text-navy-900">—</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Delivery Channel</span><span id="rev-delivery-detail" class="font-medium text-slate-800">—</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">You Send</span><span id="rev-send-amount" class="font-semibold text-slate-800">—</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Transfer Fee</span><span id="rev-fee" class="font-semibold text-slate-800">—</span></div>
+                        <div id="rev-promo-row" class="hidden flex justify-between text-emerald-700 font-semibold"><span>Promo (<span id="rev-promo-code-label"></span>)</span><span id="rev-promo-discount"></span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Locked FX Rate</span><span id="rev-rate" class="font-semibold text-emerald-700">—</span></div>
+                        <div class="flex justify-between pt-2 border-t border-slate-200"><span class="font-bold text-navy-900">Recipient Receives</span><span id="rev-receive-amount" class="font-display font-extrabold text-lg text-emerald-600">—</span></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="checkout-promo-input" placeholder="Promo code (try SWIFTFREE or WELCOME5)" class="flex-1 rounded-xl border border-slate-300 px-3.5 py-2 text-xs font-semibold uppercase">
+                        <button type="button" onclick="applyCheckoutPromo()" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-xs font-bold text-navy-900">Apply</button>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Select Funding Source</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <label class="flex items-center gap-2.5 p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer"><input type="radio" name="funding-source" value="wallet" checked class="accent-emerald-600"><div><div class="text-xs font-bold text-navy-900">SwiftPay Wallet</div><div id="checkout-wallet-bal-hint" class="text-[11px] text-emerald-700 font-semibold">Available: 0.00</div></div></label>
+                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-300 bg-white cursor-pointer"><input type="radio" name="funding-source" value="mpesa" class="accent-emerald-600"><div><div class="text-xs font-bold text-navy-900">M-Pesa Express</div><div class="text-[11px] text-slate-500">STK Push</div></div></label>
+                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-300 bg-white cursor-pointer"><input type="radio" name="funding-source" value="card" class="accent-emerald-600"><div><div class="text-xs font-bold text-navy-900">Visa Debit Card</div><div class="text-[11px] text-slate-500">Instant authorization</div></div></label>
+                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-300 bg-white cursor-pointer"><input type="radio" name="funding-source" value="bank" class="accent-emerald-600"><div><div class="text-xs font-bold text-navy-900">Linked Bank ACH</div><div class="text-[11px] text-slate-500">ACH / SEPA</div></div></label>
+                        </div>
+                    </div>
+                    <div class="pt-2 flex items-center justify-between gap-3">
+                        <button type="button" onclick="goToModalStep(2)" class="px-4 py-3.5 rounded-xl border border-slate-300 text-sm font-bold text-slate-700 hover:bg-slate-50">← Back</button>
+                        <button type="button" id="confirm-send-btn" onclick="executeSimulatedTransfer()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-display font-bold text-sm py-3.5 px-5 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i><span>Confirm & Send Now</span></button>
+                    </div>
+                </div>
+                <div id="modal-step-4" class="hidden p-6 sm:p-8 text-center space-y-5">
+                    <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto"><i data-lucide="check-circle-2" class="w-9 h-9"></i></div>
+                    <div><span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Transfer Dispatched</span><h4 class="font-display text-2xl font-extrabold text-navy-900 mt-1" id="receipt-amount">—</h4><p class="text-sm text-slate-500 mt-1">On its way to <strong id="receipt-recipient" class="text-slate-800">—</strong></p></div>
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-xs space-y-2 text-left">
+                        <div class="flex justify-between"><span class="text-slate-500">Tracking Reference</span><span id="receipt-id" class="font-mono font-bold text-navy-900">—</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Estimated Delivery</span><span id="receipt-eta" class="font-bold text-emerald-700">—</span></div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <button type="button" onclick="openPrintableReceipt(activeTrackedId)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold text-sm py-3.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-1.5"><i data-lucide="printer" class="w-4 h-4"></i><span>Receipt / PDF</span></button>
+                        <button type="button" onclick="trackNewTransferFromReceipt()" class="flex-1 bg-navy-900 hover:bg-navy-800 text-white font-bold text-sm py-3.5 px-4 rounded-xl transition-colors">Live Tracker</button>
+                        <button type="button" onclick="closeSendModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm py-3.5 px-4 rounded-xl transition-colors">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP UP MODAL -->
+    <div id="topup-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="fixed inset-0 bg-navy-950/80 backdrop-blur-sm" onclick="closeTopUpModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+                <div class="bg-navy-900 text-white px-6 py-4 flex items-center justify-between">
+                    <h3 class="font-display font-bold text-lg">Top Up Multi-Currency Wallet</h3>
+                    <button type="button" onclick="closeTopUpModal()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Wallet Currency</label>
+                            <select id="topup-currency" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-bold bg-white"><option value="USD">🇺🇸 USD</option><option value="KES">🇰🇪 KES</option><option value="EUR">🇪🇺 EUR</option><option value="GBP">🇬🇧 GBP</option></select>
+                        </div>
+                        <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Amount</label>
+                            <input type="number" id="topup-amount" value="500" min="1" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-bold">
+                        </div>
+                    </div>
+                    <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Funding Channel</label>
+                        <select id="topup-channel" onchange="toggleTopUpMpesaField()" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-semibold bg-white">
+                            <option value="mpesa">M-Pesa STK Push (Instant Mobile Prompt)</option>
+                            <option value="card">Visa Debit Card</option>
+                            <option value="bank">Linked Bank Transfer (ACH / SEPA)</option>
+                        </select>
+                    </div>
+                    <div id="topup-mpesa-box" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 space-y-2">
+                        <label class="block text-xs font-bold text-emerald-900">M-Pesa Phone Number for STK Push</label>
+                        <input type="tel" id="topup-mpesa-phone" placeholder="+254 7XX XXX XXX" class="w-full rounded-xl border border-emerald-300 bg-white px-3 py-2 text-sm font-mono">
+                        <p class="text-[11px] text-emerald-700">A Safaricom M-Pesa PIN prompt will appear to authorize this deposit.</p>
+                    </div>
+                    <button type="button" id="topup-submit-btn" onclick="processWalletTopUp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold py-3.5 rounded-xl shadow-lg">Initiate Deposit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECIPIENT MODAL -->
+    <div id="recipient-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="fixed inset-0 bg-navy-950/80 backdrop-blur-sm" onclick="closeRecipientModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+                <div class="bg-navy-900 text-white px-6 py-4 flex items-center justify-between">
+                    <h3 class="font-display font-bold text-lg">Add New Recipient</h3>
+                    <button type="button" onclick="closeRecipientModal()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Full Name</label><input type="text" id="new-ben-name" placeholder="e.g. Amina Wanjiku" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Country</label>
+                            <select id="new-ben-country" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-semibold bg-white"><option value="KE">🇰🇪 Kenya</option><option value="NG">🇳🇬 Nigeria</option><option value="IN">🇮🇳 India</option><option value="GB">🇬🇧 UK</option><option value="EU">🇪🇺 EU</option><option value="US">🇺🇸 US</option><option value="CA">🇨🇦 Canada</option><option value="AU">🇦🇺 Australia</option></select>
+                        </div>
+                        <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Method</label>
+                            <select id="new-ben-method" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-semibold bg-white"><option value="mobile">Mobile Money</option><option value="bank">Bank Transfer</option><option value="cash">Cash Pickup</option></select>
+                        </div>
+                    </div>
+                    <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Account / Phone / Details</label><input type="text" id="new-ben-detail" placeholder="e.g. +254 712 345 890 or Bank •••• 1234" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"></div>
+                    <button type="button" onclick="saveNewBeneficiary()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold text-sm py-3 rounded-xl">Save Recipient</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECEIPT MODAL -->
+    <div id="receipt-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="fixed inset-0 bg-navy-950/80 backdrop-blur-sm" onclick="closeReceiptModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden" id="printable-receipt-area">
+                <div class="bg-navy-900 text-white px-6 py-4 flex items-center justify-between">
+                    <h3 class="font-display font-bold text-lg">Payment Receipt</h3>
+                    <button type="button" onclick="closeReceiptModal()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+                <div class="p-6 space-y-3 text-sm">
+                    <div class="flex justify-between"><span class="text-slate-500">Reference</span><span id="pdf-rec-id" class="font-mono font-bold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Date</span><span id="pdf-rec-date" class="font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Sender</span><span id="pdf-rec-sender" class="font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Funding</span><span id="pdf-rec-funding" class="font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Recipient</span><span id="pdf-rec-recipient" class="font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Channel</span><span id="pdf-rec-channel" class="font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Sent</span><span id="pdf-rec-sent" class="font-bold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Payout</span><span id="pdf-rec-payout" class="font-display font-extrabold text-emerald-700">—</span></div>
+                    <div class="flex justify-between pt-2 border-t"><span class="font-bold">Status</span><span id="pdf-rec-status" class="font-bold text-emerald-700">—</span></div>
+                </div>
+                <div class="px-6 pb-6"><button type="button" onclick="window.print()" class="w-full bg-navy-900 hover:bg-navy-800 text-white font-bold text-sm py-3 rounded-xl">Print / Save PDF</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script type="module">
+        const API_BASE_URL = 'https://tinyurl.pythonanywhere.com';
+
+        const CURRENCIES = {
+            USD: { name: 'US Dollar', flag: '🇺🇸', rate: 1, country: 'US' },
+            KES: { name: 'Kenyan Shilling', flag: '🇰🇪', rate: 129.50, country: 'KE' },
+            EUR: { name: 'Euro', flag: '🇪🇺', rate: 0.92, country: 'EU' },
+            GBP: { name: 'British Pound', flag: '🇬🇧', rate: 0.79, country: 'GB' },
+            NGN: { name: 'Nigerian Naira', flag: '🇳🇬', rate: 1540.00, country: 'NG' },
+            INR: { name: 'Indian Rupee', flag: '🇮🇳', rate: 83.50, country: 'IN' },
+            CAD: { name: 'Canadian Dollar', flag: '🇨🇦', rate: 1.36, country: 'CA' },
+            AUD: { name: 'Australian Dollar', flag: '🇦🇺', rate: 1.52, country: 'AU' }
+        };
+
+        const COUNTRY_TO_CURRENCY = { KE: 'KES', NG: 'NGN', IN: 'INR', GB: 'GBP', EU: 'EUR', US: 'USD', CA: 'CAD', AU: 'AUD' };
+
+        const DELIVERY_CONFIG = {
+            mobile: { label: 'Mobile Money (M-Pesa / Wallet)', baseFeeUSD: 2.99, pctFee: 0.0035, eta: 'Within 2 minutes' },
+            bank: { label: 'Bank Transfer', baseFeeUSD: 3.99, pctFee: 0.0045, eta: 'Same business day' },
+            cash: { label: 'Cash Pickup', baseFeeUSD: 4.99, pctFee: 0.0055, eta: 'Ready in 5 minutes' }
+        };
+
+        let appState = {
+            user: { name: '', email: '', phone: '', kycTier: 1, docType: '', docNumber: '' },
+            wallets: { USD: 0, KES: 0, EUR: 0, GBP: 0 },
+            walletLogs: [],
+            beneficiaries: [],
+            transfers: []
+        };
+
+        let calcState = { sendCurrency: 'USD', receiveCurrency: 'KES', sendAmount: 500, receiveAmount: 0, method: 'mobile', lastEdited: 'send', promoCode: '', promoDiscountUSD: 0 };
+        let modalState = { step: 1, method: 'mobile', country: 'KE' };
+        let activeTrackedId = null;
+        let rateLockSeconds = 299;
+
+        // --- INIT ---
+        async function bootstrapApp() {
+            populateCurrencyDropdowns();
+            bindCalculatorEvents();
+            recalculate();
+            startRateLockCountdown();
+            fetchLiveFXRates(false);
+            if (window.lucide) lucide.createIcons();
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootstrapApp);
+        else bootstrapApp();
+
+        // --- AUTH ---
+        window.switchAuthTab = function(tab) {
+            const isLogin = tab === 'login';
+            document.getElementById('auth-login-form').classList.toggle('hidden', !isLogin);
+            document.getElementById('auth-register-form').classList.toggle('hidden', isLogin);
+            document.getElementById('tab-login').className = isLogin ? 'flex-1 py-2.5 rounded-lg text-sm font-bold bg-emerald-500 text-navy-950 transition-all' : 'flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-400 transition-all';
+            document.getElementById('tab-register').className = !isLogin ? 'flex-1 py-2.5 rounded-lg text-sm font-bold bg-emerald-500 text-navy-950 transition-all' : 'flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-400 transition-all';
+        };
+
+        window.doLogin = async function() {
+            const email = document.getElementById('auth-login-email').value.trim();
+            if (!email || !email.includes('@')) { showToast('Enter a valid email.', 'error'); return; }
+            const btn = document.getElementById('btn-auth-login');
+            btn.disabled = true; btn.textContent = 'Signing in...';
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/me`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+                const data = await res.json();
+                if (data.error) { showToast(data.error, 'error'); return; }
+                appState.user.name = data.name; appState.user.email = data.email;
+                localStorage.setItem('swiftpay_email', email);
+                document.getElementById('auth-gate').classList.add('hidden');
+                showToast(`Welcome back, ${data.name.split(' ')[0]}!`, 'success');
+                await syncUserWalletsFromBackend(false);
+                refreshAllUI();
+            } catch(e) { showToast('Connection error. Check your internet.', 'error'); }
+            btn.disabled = false; btn.textContent = 'Sign In & Access Wallet';
+        };
+
+        window.doRegister = async function() {
+            const name = document.getElementById('auth-reg-name').value.trim();
+            const email = document.getElementById('auth-reg-email').value.trim();
+            const phone = document.getElementById('auth-reg-phone').value.trim();
+            if (!name) { showToast('Enter your full name.', 'error'); return; }
+            if (!email || !email.includes('@')) { showToast('Enter a valid email.', 'error'); return; }
+            const btn = document.getElementById('btn-auth-register');
+            btn.disabled = true; btn.textContent = 'Creating account...';
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/me`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, name }) });
+                const data = await res.json();
+                if (data.error) { showToast(data.error, 'error'); return; }
+                appState.user.name = data.name; appState.user.email = data.email; appState.user.phone = phone;
+                localStorage.setItem('swiftpay_email', email);
+                document.getElementById('auth-gate').classList.add('hidden');
+                showToast(`Account created! Welcome, ${name.split(' ')[0]}`, 'success');
+                await syncUserWalletsFromBackend(false);
+                refreshAllUI();
+            } catch(e) { showToast('Connection error. Try again.', 'error'); }
+            btn.disabled = false; btn.textContent = 'Create Account';
+        };
+
+        window.doLogout = function() {
+            appState.user = { name: '', email: '', phone: '', kycTier: 1, docType: '', docNumber: '' };
+            appState.wallets = {}; appState.transfers = []; appState.beneficiaries = [];
+            localStorage.removeItem('swiftpay_email');
+            document.getElementById('auth-gate').classList.remove('hidden');
+            document.getElementById('auth-login-email').value = '';
+            switchAuthTab('login');
+            refreshAllUI();
+        };
+
+        (function autoLogin() {
+            const saved = localStorage.getItem('swiftpay_email');
+            if (saved) { document.getElementById('auth-login-email').value = saved; doLogin(); }
+        })();
+
+        // --- BACKEND SYNC ---
+        async function syncUserWalletsFromBackend(notify = false) {
+            const syncStatusEl = document.getElementById('cloud-sync-status');
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/me`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: appState.user.email, name: appState.user.name }) });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                if (data.wallets && typeof data.wallets === 'object') {
+                    appState.wallets = { USD: 0, KES: 0, EUR: 0, GBP: 0, ...data.wallets };
+                }
+                if (syncStatusEl) syncStatusEl.textContent = `Connected • ${API_BASE_URL.replace('https://','')} (${appState.user.email})`;
+                refreshAllUI();
+                if (notify) showToast('Wallet synced!', 'success');
+            } catch(err) {
+                if (syncStatusEl) syncStatusEl.textContent = `Offline • ${appState.user.email}`;
+                if (notify) showToast('Could not reach backend.', 'error');
+            }
+        }
+
+        // --- UI REFRESH ---
+        function refreshAllUI() {
+            renderWalletUI();
+            renderBeneficiariesUI();
+            renderTransfersList();
+            if (activeTrackedId) renderLiveTracker(activeTrackedId);
+            renderFullLedger();
+            renderProfileAndKYC();
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // --- WALLET ---
+        function renderWalletUI() {
+            const strip = document.getElementById('top-wallet-strip');
+            const grid = document.getElementById('wallet-cards-grid');
+            const logList = document.getElementById('wallet-ledger-list');
+            if (strip) strip.innerHTML = Object.entries(appState.wallets).map(([c,b]) => `<span class="bg-white/10 px-2.5 py-1 rounded-lg font-mono font-semibold text-white">${CURRENCIES[c]?.flag||''} ${formatNumber(b)} <span class="text-emerald-400">${c}</span></span>`).join('');
+            if (grid) grid.innerHTML = Object.entries(appState.wallets).map(([c,b]) => `<div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm hover:border-emerald-400 transition-all"><div class="flex items-center justify-between mb-4"><span class="text-2xl">${CURRENCIES[c]?.flag||'💱'}</span><span class="text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">${c} Account</span></div><div class="text-xs text-slate-500">${CURRENCIES[c]?.name||c} Balance</div><div class="font-display font-extrabold text-2xl text-navy-900 mt-1">${formatNumber(b)} ${c}</div><div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs"><button type="button" onclick="openTopUpModal('${c}')" class="font-bold text-emerald-600 hover:text-emerald-700">+ Add ${c}</button><button type="button" onclick="useWalletToSend('${c}')" class="font-semibold text-slate-600 hover:text-navy-900">Send →</button></div></div>`).join('');
+            if (logList) logList.innerHTML = appState.walletLogs.length ? appState.walletLogs.map(i => `<div class="py-3.5 flex items-center justify-between"><div><div class="font-bold text-navy-900">${i.type}</div><div class="text-xs text-slate-400">${i.id} • ${i.date}</div></div><div class="text-right"><div class="font-mono font-bold text-emerald-600">${i.amount}</div><div class="text-[11px] text-slate-500">${i.status}</div></div></div>`).join('') : '<p class="text-slate-400 text-sm py-2">No funding activity yet.</p>';
+        }
+
+        window.useWalletToSend = function(c) {
+            calcState.sendCurrency = c;
+            document.getElementById('send-currency').value = c;
+            if (calcState.receiveCurrency === c) { calcState.receiveCurrency = c === 'USD' ? 'KES' : 'USD'; document.getElementById('receive-currency').value = calcState.receiveCurrency; }
+            recalculate(); switchAppView('overview'); openSendModal();
+        };
+
+        window.openTopUpModal = function(c = 'USD') { document.getElementById('topup-currency').value = c; toggleTopUpMpesaField(); document.getElementById('topup-modal').classList.remove('hidden'); };
+        window.closeTopUpModal = function() { document.getElementById('topup-modal').classList.add('hidden'); };
+        window.toggleTopUpMpesaField = function() { document.getElementById('topup-mpesa-box').classList.toggle('hidden', document.getElementById('topup-channel').value !== 'mpesa'); };
+
+        window.processWalletTopUp = async function() {
+            const curr = document.getElementById('topup-currency').value;
+            const amt = parseFloat(document.getElementById('topup-amount').value) || 0;
+            const btn = document.getElementById('topup-submit-btn');
+            if (amt <= 0) { showToast('Enter a valid amount.', 'error'); return; }
+            btn.disabled = true; btn.textContent = 'Connecting to Flutterwave...';
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/topup/init`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: appState.user.email, name: appState.user.name, amount: amt, currency: curr }) });
+                const data = await res.json();
+                if (!res.ok || data.status !== 'ok' || !data.link) throw new Error(data.detail || data.error || 'Payment init failed');
+                appState.walletLogs.unshift({ id: data.tx_ref || ('DEP-'+Math.floor(100+Math.random()*900)), type: `Flutterwave (${curr})`, amount: `+${formatNumber(amt)} ${curr}`, date: 'Just now', status: 'Pending Payment' });
+                refreshAllUI();
+                showToast('Redirecting to secure payment...', 'success');
+                window.open(data.link, '_blank', 'noopener');
+                closeTopUpModal();
+                let polls = 0;
+                const iv = setInterval(async () => { polls++; await syncUserWalletsFromBackend(false); if (polls >= 24) clearInterval(iv); }, 5000);
+            } catch(err) { showToast(`Deposit error: ${err.message}`, 'error'); }
+            btn.disabled = false; btn.textContent = 'Initiate Deposit';
+        };
+
+        // --- RECIPIENTS ---
+        function renderBeneficiariesUI() {
+            const grid = document.getElementById('recipients-grid');
+            if (!grid) return;
+            grid.innerHTML = appState.beneficiaries.length ? appState.beneficiaries.map(b => `<div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm hover:border-emerald-400 transition-all flex flex-col justify-between gap-4"><div class="flex items-center justify-between mb-3"><div class="w-11 h-11 rounded-2xl bg-navy-900 text-emerald-400 font-display font-bold flex items-center justify-center">${b.name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div><span class="text-xs font-bold uppercase px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">${CURRENCIES[COUNTRY_TO_CURRENCY[b.country]]?.flag||''} ${b.country}</span></div><h4 class="font-display font-bold text-lg text-navy-900">${b.name}</h4><p class="text-xs text-slate-500 mt-1">${b.detail}</p><div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2"><button type="button" onclick="quickSendToBeneficiary('${b.id}')" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-navy-950 font-bold text-xs py-2.5 px-3 rounded-xl">Quick Send →</button><button type="button" onclick="deleteBeneficiary('${b.id}')" class="p-2.5 rounded-xl border border-slate-200 hover:bg-red-50 hover:text-red-600 text-slate-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>`).join('') : '<p class="text-slate-400 col-span-full">No saved recipients yet.</p>';
+        }
+        window.openRecipientModal = function() { document.getElementById('recipient-modal').classList.remove('hidden'); };
+        window.closeRecipientModal = function() { document.getElementById('recipient-modal').classList.add('hidden'); };
+        window.saveNewBeneficiary = function() {
+            const name = document.getElementById('new-ben-name').value.trim();
+            const country = document.getElementById('new-ben-country').value;
+            const method = document.getElementById('new-ben-method').value;
+            const detail = document.getElementById('new-ben-detail').value.trim();
+            if (!name || !detail) { showToast('Enter name and details.', 'error'); return; }
+            appState.beneficiaries.unshift({ id: 'ben-'+Date.now(), name, country, method, detail, favorite: true });
+            document.getElementById('new-ben-name').value = ''; document.getElementById('new-ben-detail').value = '';
+            closeRecipientModal(); refreshAllUI(); showToast(`${name} saved!`, 'success');
+        };
+        window.deleteBeneficiary = function(id) { appState.beneficiaries = appState.beneficiaries.filter(b=>b.id!==id); refreshAllUI(); showToast('Recipient removed.', 'success'); };
+        window.quickSendToBeneficiary = function(id) {
+            const ben = appState.beneficiaries.find(b=>b.id===id); if (!ben) return;
+            const tc = COUNTRY_TO_CURRENCY[ben.country]||'KES';
+            if (tc !== calcState.sendCurrency) { calcState.receiveCurrency = tc; document.getElementById('receive-currency').value = tc; }
+            calcState.method = ben.method; document.getElementById('calc-delivery-method').value = ben.method;
+            recalculate(); openSendModal(); autofillRecipientFromSaved(id); goToModalStep(2);
+        };
+
+        // --- SEND MODAL ---
+        window.openSendModal = function() {
+            if (calcState.sendAmount <= 0) { showToast('Enter a valid amount.', 'error'); return; }
+            const sendUSD = calcState.sendAmount / CURRENCIES[calcState.sendCurrency].rate;
+            const dailyMax = appState.user.kycTier >= 2 ? 50000 : 2500;
+            if (sendUSD > dailyMax) { showToast(`Exceeds Tier ${appState.user.kycTier} limit ($${dailyMax.toLocaleString()}). Upgrade KYC.`, 'error'); switchAppView('kyc'); return; }
+            modalState.method = calcState.method;
+            modalState.country = CURRENCIES[calcState.receiveCurrency]?.country || 'KE';
+            const ss = document.getElementById('modal-saved-recipient-select');
+            ss.innerHTML = '<option value="">-- Enter Manually --</option>' + appState.beneficiaries.map(b=>`<option value="${b.id}">${b.name} (${b.detail})</option>`).join('');
+            document.getElementById('modal-country').value = modalState.country;
+            selectModalMethod(modalState.method);
+            updateModalSummaryHeader(); goToModalStep(1);
+            document.getElementById('send-money-modal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            if (window.lucide) lucide.createIcons();
+        };
+        window.closeSendModal = function() { document.getElementById('send-money-modal').classList.add('hidden'); document.body.classList.remove('overflow-hidden'); };
+        window.autofillRecipientFromSaved = function(id) {
+            const ben = appState.beneficiaries.find(b=>b.id===id); if (!ben) return;
+            const parts = ben.name.split(' ');
+            document.getElementById('rec-first-name').value = parts[0]||'';
+            document.getElementById('rec-last-name').value = parts.slice(1).join(' ')||'Member';
+            selectModalMethod(ben.method);
+            if (ben.method==='mobile' && document.getElementById('rec-phone')) document.getElementById('rec-phone').value = ben.detail.replace(/^[^\+0-9]+/,'');
+            else if (ben.method==='bank' && document.getElementById('rec-bank-name')) { document.getElementById('rec-bank-name').value = ben.detail; document.getElementById('rec-account-num').value = '00192837465'; }
+        };
+        document.getElementById('modal-country')?.addEventListener('change', e => {
+            modalState.country = e.target.value;
+            const tc = COUNTRY_TO_CURRENCY[modalState.country];
+            if (tc && tc !== calcState.sendCurrency) { calcState.receiveCurrency = tc; document.getElementById('receive-currency').value = tc; recalculate(); updateModalSummaryHeader(); }
+        });
+        function updateModalSummaryHeader() {
+            document.getElementById('modal-summary-header').textContent = `${formatNumber(calcState.sendAmount)} ${calcState.sendCurrency} → ${formatNumber(calcState.receiveAmount)} ${calcState.receiveCurrency}`;
+        }
+        window.selectModalMethod = function(m) {
+            modalState.method = m; calcState.method = m;
+            document.getElementById('calc-delivery-method').value = m;
+            recalculate(); updateModalSummaryHeader();
+            document.querySelectorAll('.method-card').forEach(c => {
+                c.className = c.dataset.method===m ? 'method-card text-left p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 transition-all' : 'method-card text-left p-4 rounded-2xl border-2 border-slate-200 hover:border-slate-300 transition-all';
+            });
+            renderDynamicRecipientFields(m);
+        };
+        function renderDynamicRecipientFields(m) {
+            const ct = document.getElementById('dynamic-recipient-fields');
+            if (m==='mobile') {
+                const dc = modalState.country==='KE' ? '+254' : modalState.country==='NG' ? '+234' : '+1';
+                ct.innerHTML = `<div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Mobile Money Operator</label><select id="rec-wallet-provider" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium bg-white"><option>M-Pesa</option><option>Airtel Money</option><option>MTN MoMo</option><option>Local Wallet</option></select></div><div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Recipient Mobile Number</label><input type="tel" id="rec-phone" value="${dc} 712 345 678" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"></div>`;
+            } else if (m==='bank') {
+                ct.innerHTML = `<div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Bank Name & SWIFT/BIC</label><input type="text" id="rec-bank-name" placeholder="e.g. Equity Bank (EQBLKENA)" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"></div><div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Account Number / IBAN</label><input type="text" id="rec-account-num" placeholder="Enter bank account or IBAN" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-mono font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"></div>`;
+            } else {
+                ct.innerHTML = `<div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Pickup City / Agent Branch</label><input type="text" id="rec-pickup-city" placeholder="e.g. Nairobi CBD, Mombasa, Lagos, London" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"></div>`;
+            }
+        }
+
+        window.goToModalStep = function(n) {
+            modalState.step = n;
+            [1,2,3,4].forEach(i => document.getElementById(`modal-step-${i}`).classList.toggle('hidden', i !== n));
+            const subs = { 1:'Step 1 of 3 • Delivery Method & Destination', 2:'Step 2 of 3 • Recipient Details', 3:'Step 3 of 3 • Review, Promo & Funding Source', 4:'Complete • Digital Receipt & Live Webhook Tracking' };
+            const widths = { 1:'33.33%', 2:'66.66%', 3:'90%', 4:'100%' };
+            document.getElementById('modal-subtitle').textContent = subs[n];
+            document.getElementById('modal-progress-bar').style.width = widths[n];
+            if (window.lucide) lucide.createIcons();
+        };
+
+        window.validateAndGoToStep3 = function() {
+            const fn = document.getElementById('rec-first-name').value.trim();
+            const ln = document.getElementById('rec-last-name').value.trim();
+            const errEl = document.getElementById('step-2-error');
+            if (!fn || !ln) { errEl.textContent = 'Enter recipient first and last name.'; errEl.classList.remove('hidden'); return; }
+            let detail = '';
+            if (modalState.method === 'mobile') {
+                const p = document.getElementById('rec-phone')?.value.trim();
+                if (!p) { errEl.textContent = 'Enter a valid mobile number.'; errEl.classList.remove('hidden'); return; }
+                detail = `${document.getElementById('rec-wallet-provider')?.value||'M-Pesa'} (${p})`;
+            } else if (modalState.method === 'bank') {
+                const bk = document.getElementById('rec-bank-name')?.value.trim();
+                const ac = document.getElementById('rec-account-num')?.value.trim();
+                if (!bk || !ac) { errEl.textContent = 'Enter bank name and account number.'; errEl.classList.remove('hidden'); return; }
+                detail = `${bk} (•••• ${ac.slice(-4)})`;
+            } else {
+                const city = document.getElementById('rec-pickup-city')?.value.trim();
+                if (!city) { errEl.textContent = 'Enter pickup city.'; errEl.classList.remove('hidden'); return; }
+                detail = `Cash Pickup (${city})`;
+            }
+            errEl.classList.add('hidden');
+            calcState.promoCode = ''; calcState.promoDiscountUSD = 0;
+            document.getElementById('rev-promo-row').classList.add('hidden');
+            const fee = calculateFeeInSendCurrency(calcState.sendAmount, calcState.sendCurrency, calcState.method);
+            const rate = getExchangeRate(calcState.sendCurrency, calcState.receiveCurrency);
+            const fr = rate >= 10 ? rate.toFixed(2) : rate.toFixed(4);
+            document.getElementById('rev-recipient-name').textContent = `${fn} ${ln}`;
+            document.getElementById('rev-delivery-detail').textContent = detail;
+            document.getElementById('rev-send-amount').textContent = `${formatNumber(calcState.sendAmount)} ${calcState.sendCurrency}`;
+            document.getElementById('rev-fee').textContent = `${formatNumber(fee)} ${calcState.sendCurrency}`;
+            document.getElementById('rev-rate').textContent = `1 ${calcState.sendCurrency} = ${fr} ${calcState.receiveCurrency}`;
+            document.getElementById('rev-receive-amount').textContent = `${formatNumber(calcState.receiveAmount)} ${calcState.receiveCurrency}`;
+            const wb = appState.wallets[calcState.sendCurrency] || 0;
+            document.getElementById('checkout-wallet-bal-hint').textContent = `Available: ${formatNumber(wb)} ${calcState.sendCurrency}`;
+            goToModalStep(3);
+        };
+
+        window.applyCheckoutPromo = function() {
+            const code = document.getElementById('checkout-promo-input').value.trim().toUpperCase();
+            if (!code) return;
+            if (code === 'SWIFTFREE' || code === 'WELCOME5') {
+                const fee = calculateFeeInSendCurrency(calcState.sendAmount, calcState.sendCurrency, calcState.method);
+                const disc = code === 'SWIFTFREE' ? fee : Math.min(fee, 5 * CURRENCIES[calcState.sendCurrency].rate);
+                const rate = getExchangeRate(calcState.sendCurrency, calcState.receiveCurrency);
+                const boosted = (calcState.sendAmount - (fee - disc)) * rate;
+                document.getElementById('rev-promo-row').classList.remove('hidden');
+                document.getElementById('rev-promo-code-label').textContent = code;
+                document.getElementById('rev-promo-discount').textContent = `-${formatNumber(disc)} ${calcState.sendCurrency}`;
+                document.getElementById('rev-receive-amount').textContent = `${formatNumber(boosted)} ${calcState.receiveCurrency}`;
+                calcState.receiveAmount = boosted;
+                showToast(`Promo ${code} applied!`, 'success');
+            } else { showToast('Invalid promo code.', 'error'); }
+        };
+
+        window.executeSimulatedTransfer = async function() {
+            const funding = document.querySelector('input[name="funding-source"]:checked')?.value || 'wallet';
+            if (funding === 'wallet') {
+                const avail = appState.wallets[calcState.sendCurrency] || 0;
+                if (avail < calcState.sendAmount) { showToast(`Insufficient ${calcState.sendCurrency} balance.`, 'error'); return; }
+                appState.wallets[calcState.sendCurrency] = avail - calcState.sendAmount;
+            }
+            const btn = document.getElementById('confirm-send-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-spin inline-block w-4 h-4 border-2 border-navy-950 border-t-transparent rounded-full"></span><span>Processing...</span>';
+            await new Promise(r => setTimeout(r, 850));
+            const newId = 'SWP-' + Math.floor(100000 + Math.random()*900000);
+            const rName = document.getElementById('rev-recipient-name').textContent;
+            const rDetail = document.getElementById('rev-delivery-detail').textContent;
+            const nowT = new Date().toTimeString().slice(0,8);
+            const fl = { wallet: `SwiftPay ${calcState.sendCurrency} Wallet`, mpesa: 'M-Pesa STK', card: 'Visa Debit', bank: 'Bank ACH' };
+            appState.transfers.unshift({
+                id: newId, recipient: rName, methodLabel: DELIVERY_CONFIG[calcState.method].label, detail: rDetail,
+                sendAmount: `${formatNumber(calcState.sendAmount)} ${calcState.sendCurrency}`, rawSendAmount: calcState.sendAmount,
+                sendCurrency: calcState.sendCurrency, receiveCurrency: calcState.receiveCurrency,
+                receiveAmount: `${formatNumber(calcState.receiveAmount)} ${calcState.receiveCurrency}`,
+                fundingSource: fl[funding], date: 'Just now', statusStep: 0, eta: DELIVERY_CONFIG[calcState.method].eta,
+                webhookLogs: [`[${nowT}] webhook.transfer.created — Funded via ${fl[funding]}`]
+            });
+            activeTrackedId = newId;
+            document.getElementById('receipt-id').textContent = `#${newId}`;
+            document.getElementById('receipt-recipient').textContent = rName;
+            document.getElementById('receipt-amount').textContent = `${formatNumber(calcState.receiveAmount)} ${calcState.receiveCurrency}`;
+            document.getElementById('receipt-eta').textContent = DELIVERY_CONFIG[calcState.method].eta;
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="lock" class="w-4 h-4"></i><span>Confirm & Send Now</span>';
+            refreshAllUI(); goToModalStep(4);
+            showToast(`Transfer #${newId} dispatched!`, 'success');
+        };
+
+        window.trackNewTransferFromReceipt = function() { closeSendModal(); switchAppView('overview'); document.getElementById('tracker-dashboard')?.scrollIntoView({behavior:'smooth'}); };
+
+        // --- TRANSFERS & TRACKER ---
+        function renderTransfersList() {
+            const listEl = document.getElementById('recent-transfers-list');
+            const countEl = document.getElementById('transfer-count-label');
+            if (countEl) countEl.textContent = `${appState.transfers.length} Transactions`;
+            if (!listEl) return;
+            listEl.innerHTML = appState.transfers.slice(0,5).map(tx => {
+                const sel = tx.id === activeTrackedId;
+                const del = tx.statusStep >= 3;
+                return `<div onclick="selectTrackedTransfer('${tx.id}')" class="p-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${sel?'bg-emerald-50/70':'hover:bg-slate-50'}"><div class="flex items-start sm:items-center gap-4"><div class="w-11 h-11 rounded-2xl flex items-center justify-center font-display font-bold text-sm shrink-0 ${sel?'bg-navy-900 text-emerald-400':'bg-slate-100 text-navy-900'}">${tx.recipient.split(' ').map(n=>n[0]).join('').slice(0,2)}</div><div><div class="flex items-center gap-2 flex-wrap"><span class="font-bold text-navy-900 text-sm">${tx.recipient}</span><span class="text-xs font-mono text-slate-400">#${tx.id}</span></div><div class="text-xs text-slate-500 mt-0.5">${tx.methodLabel} • ${tx.date}</div></div></div><div class="flex sm:flex-col items-center sm:items-end justify-between gap-1"><div class="font-display font-bold text-sm text-navy-900">${tx.receiveAmount}</div><div class="flex items-center gap-2"><span class="text-xs text-slate-400">${tx.sendAmount}</span><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${del?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}"><span class="w-1.5 h-1.5 rounded-full ${del?'bg-emerald-600':'bg-amber-500 animate-pulse'}"></span>${del?'Delivered':'Settling'}</span></div></div></div>`;
+            }).join('') || '<p class="p-6 text-slate-400 text-sm">No transfers yet.</p>';
+        }
+
+        window.selectTrackedTransfer = function(id) { activeTrackedId = id; renderTransfersList(); renderLiveTracker(id); };
+
+        function renderLiveTracker(id) {
+            const tx = appState.transfers.find(t=>t.id===id); if (!tx) return;
+            document.getElementById('tracker-id').textContent = `#${tx.id}`;
+            document.getElementById('tracker-recipient').textContent = `${tx.recipient} (${tx.detail})`;
+            document.getElementById('tracker-sent').textContent = tx.sendAmount;
+            document.getElementById('tracker-received').textContent = tx.receiveAmount;
+            const del = tx.statusStep >= 3;
+            const badge = document.getElementById('tracker-badge');
+            badge.className = del ? 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30';
+            badge.innerHTML = del ? '<i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i> Delivered' : '<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> In Transit';
+            const steps = [
+                { title: 'Payment & Compliance Verified', desc: `Funded via ${tx.fundingSource||'SwiftPay'}` },
+                { title: 'FX Converted at Locked Rate', desc: 'Exchanged at guaranteed interbank rate' },
+                { title: 'Dispatched to Payout Partner', desc: `Routed via ${tx.methodLabel}` },
+                { title: 'Delivered to Recipient', desc: 'Funds credited and receipt issued' }
+            ];
+            document.getElementById('tracker-steps').innerHTML = `<div class="absolute left-2.5 top-2 bottom-2 w-0.5 bg-white/15"></div>` + steps.map((s,i) => {
+                const done = i <= tx.statusStep;
+                const cur = i === tx.statusStep && !del;
+                return `<div class="relative"><div class="absolute -left-7 top-0.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${done?'bg-emerald-500 text-navy-950':'bg-navy-800 border border-white/25 text-slate-400'}">${done?'✓':i+1}</div><div class="text-sm font-semibold ${done?'text-white':'text-slate-400'} flex items-center gap-2"><span>${s.title}</span>${cur?'<span class="text-[10px] uppercase tracking-wider bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded">Active</span>':''}</div><div class="text-xs text-slate-400 mt-0.5">${s.desc}</div></div>`;
+            }).join('');
+            const logBox = document.getElementById('tracker-webhook-log');
+            if (logBox) { logBox.innerHTML = (tx.webhookLogs||[]).map(l=>`<div>${l}</div>`).join(''); logBox.scrollTop = logBox.scrollHeight; }
+            const advBtn = document.getElementById('advance-status-btn');
+            advBtn.disabled = del;
+            advBtn.textContent = del ? 'Settled ✓' : 'Force Next Webhook →';
+            advBtn.className = del ? 'text-xs font-semibold bg-white/10 text-slate-400 px-3.5 py-2 rounded-xl cursor-not-allowed' : 'text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-navy-950 px-3.5 py-2 rounded-xl transition-colors';
+            if (window.lucide) lucide.createIcons();
+        }
+
+        window.advanceActiveTransfer = function() {
+            const tx = appState.transfers.find(t=>t.id===activeTrackedId);
+            if (!tx || tx.statusStep >= 3) return;
+            tx.statusStep++;
+            const nowT = new Date().toTimeString().slice(0,8);
+            const events = [
+                `[${nowT}] webhook.payment.authorized — KYC & AML passed`,
+                `[${nowT}] webhook.fx.converted — ${tx.sendAmount} → ${tx.receiveAmount}`,
+                `[${nowT}] webhook.partner.dispatched — Routed to ${tx.methodLabel}`,
+                `[${nowT}] webhook.payout.delivered — Credited to ${tx.recipient}`
+            ];
+            tx.webhookLogs = tx.webhookLogs||[];
+            tx.webhookLogs.push(events[tx.statusStep]);
+            if (tx.statusStep === 3) tx.eta = 'Delivered';
+            refreshAllUI();
+            if (tx.statusStep === 3) showToast(`Transfer #${tx.id} delivered!`, 'success');
+        };
+
+        // --- LEDGER ---
+        window.renderFullLedger = function() {
+            const tbody = document.getElementById('full-ledger-tbody'); if (!tbody) return;
+            const q = (document.getElementById('ledger-search-input')?.value||'').toLowerCase();
+            const sf = document.getElementById('ledger-status-filter')?.value || 'all';
+            const filtered = appState.transfers.filter(tx => {
+                const mq = tx.recipient.toLowerCase().includes(q) || tx.id.toLowerCase().includes(q) || (tx.sendAmount||'').toLowerCase().includes(q);
+                const del = tx.statusStep >= 3;
+                const ms = sf==='all' || (sf==='delivered'&&del) || (sf==='active'&&!del);
+                return mq && ms;
+            });
+            tbody.innerHTML = filtered.map(tx => {
+                const del = tx.statusStep >= 3;
+                return `<tr class="hover:bg-slate-50 transition-colors"><td class="py-4 px-5"><div class="font-mono font-bold text-navy-900">#${tx.id}</div><div class="text-xs text-slate-400">${tx.date}</div></td><td class="py-4 px-5"><div class="font-bold text-navy-900">${tx.recipient}</div><div class="text-xs text-slate-500">${tx.methodLabel} (${tx.detail})</div></td><td class="py-4 px-5 font-semibold text-slate-700">${tx.sendAmount}</td><td class="py-4 px-5 font-display font-bold text-emerald-700">${tx.receiveAmount}</td><td class="py-4 px-5"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${del?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}">${del?'Delivered':'In Progress'}</span></td><td class="py-4 px-5 text-right space-x-1.5"><button type="button" onclick="openPrintableReceipt('${tx.id}')" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-xs font-bold text-navy-900">Receipt</button><button type="button" onclick="repeatTransfer('${tx.id}')" class="px-3 py-1.5 rounded-lg bg-navy-900 hover:bg-navy-800 text-xs font-bold text-white">Repeat</button></td></tr>`;
+            }).join('');
+        };
+
+        window.repeatTransfer = function(id) {
+            const tx = appState.transfers.find(t=>t.id===id); if (!tx) return;
+            calcState.sendCurrency = tx.sendCurrency||'USD';
+            calcState.receiveCurrency = tx.receiveCurrency||'KES';
+            calcState.sendAmount = tx.rawSendAmount||500;
+            document.getElementById('send-currency').value = calcState.sendCurrency;
+            document.getElementById('receive-currency').value = calcState.receiveCurrency;
+            document.getElementById('send-amount').value = calcState.sendAmount;
+            recalculate(); switchAppView('overview'); openSendModal();
+        };
+
+        window.exportTransactionsCSV = function() {
+            const headers = ['ID','Date','Recipient','Channel','Sent','Payout','Status'];
+            const rows = appState.transfers.map(t=>[t.id,t.date,`"${t.recipient}"`,`"${t.methodLabel}"`,`"${t.sendAmount}"`,`"${t.receiveAmount}"`,t.statusStep>=3?'Delivered':'In Progress']);
+            const csv = [headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+            const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = `SwiftPay_Statement_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+            URL.revokeObjectURL(a.href); showToast('CSV exported!', 'success');
+        };
+
+        // --- RECEIPT ---
+        window.openPrintableReceipt = function(id) {
+            const tx = appState.transfers.find(t=>t.id===id) || appState.transfers[0]; if (!tx) return;
+            document.getElementById('pdf-rec-id').textContent = `#${tx.id}`;
+            document.getElementById('pdf-rec-date').textContent = tx.date;
+            document.getElementById('pdf-rec-sender').textContent = appState.user.name || '—';
+            document.getElementById('pdf-rec-funding').textContent = tx.fundingSource || '—';
+            document.getElementById('pdf-rec-recipient').textContent = tx.recipient;
+            document.getElementById('pdf-rec-channel').textContent = `${tx.methodLabel} (${tx.detail})`;
+            document.getElementById('pdf-rec-sent').textContent = tx.sendAmount;
+            document.getElementById('pdf-rec-payout').textContent = tx.receiveAmount;
+            document.getElementById('pdf-rec-status').textContent = tx.statusStep>=3 ? 'DELIVERED' : 'SETTLING';
+            document.getElementById('receipt-modal').classList.remove('hidden');
+        };
+        window.closeReceiptModal = function() { document.getElementById('receipt-modal').classList.add('hidden'); };
+
+        // --- KYC ---
+        function renderProfileAndKYC() {
+            const u = appState.user;
+            const t2 = u.kycTier >= 2;
+            document.getElementById('header-user-name').textContent = u.name || '—';
+            document.getElementById('header-kyc-pill').textContent = `Tier ${u.kycTier}`;
+            document.getElementById('nav-kyc-badge').textContent = `Tier ${u.kycTier}`;
+            document.getElementById('daily-limit-indicator').textContent = `Daily Limit: ${t2?'$50,000':'$2,500'} (Tier ${u.kycTier})`;
+            document.getElementById('kyc-profile-name').textContent = u.name || '—';
+            document.getElementById('kyc-profile-contact').textContent = `${u.email||'—'} • ${u.phone||'—'}`;
+            document.getElementById('kyc-profile-limit').textContent = t2 ? '$50,000.00 / day' : '$2,500.00 / day';
+            document.getElementById('kyc-profile-tier-label').textContent = `Tier ${u.kycTier} Verified`;
+            if (t2) {
+                document.getElementById('tier2-card').className = 'bg-white rounded-3xl p-6 border-2 border-emerald-500 shadow-sm space-y-4';
+                document.getElementById('tier2-status-badge').className = 'text-xs font-bold text-emerald-600 flex items-center gap-1';
+                document.getElementById('tier2-status-badge').innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4"></i> Verified';
+                document.getElementById('submit-tier2-btn').textContent = 'Tier 2 Identity Approved ✓';
+            }
+        }
+
+        window.sendMockOTP = function() {
+            const code = Math.floor(100000 + Math.random()*900000);
+            document.getElementById('kyc-otp-input').value = code;
+            showToast(`OTP sent: ${code}`, 'success');
+        };
+        window.verifyTier1OTP = function() {
+            const v = document.getElementById('kyc-otp-input').value.trim();
+            if (v.length < 4) { showToast('Click Send OTP first.', 'error'); return; }
+            appState.user.kycTier = Math.max(1, appState.user.kycTier);
+            refreshAllUI(); showToast('Tier 1 verified!', 'success');
+        };
+        window.handleKYCDocPreview = function(input) {
+            if (input.files && input.files[0]) document.getElementById('kyc-file-label').textContent = `Selected: ${input.files[0].name}`;
+        };
+        window.submitTier2KYC = function() {
+            const docNum = document.getElementById('kyc-doc-number').value.trim();
+            if (!docNum) { showToast('Enter your ID/Passport number.', 'error'); return; }
+            appState.user.kycTier = 2;
+            appState.user.docType = document.getElementById('kyc-doc-type').value;
+            appState.user.docNumber = docNum;
+            refreshAllUI(); showToast('Tier 2 Approved! Limit upgraded to $50,000/day.', 'success');
+        };
+
+        // --- NAVIGATION ---
+        window.switchAppView = function(v) {
+            document.querySelectorAll('.app-view').forEach(s => s.classList.add('hidden'));
+            const t = document.getElementById(`view-${v}`);
+            if (t) t.classList.remove('hidden');
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+                const act = btn.dataset.view === v;
+                if (btn.closest('nav')) btn.className = act ? 'nav-tab-btn px-3.5 py-2 rounded-xl bg-emerald-500 text-navy-950 transition-all' : 'nav-tab-btn px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition-all flex items-center gap-1.5';
+                else btn.className = act ? 'nav-tab-btn shrink-0 px-3 py-1.5 rounded-lg bg-emerald-500 text-navy-950' : 'nav-tab-btn shrink-0 px-3 py-1.5 rounded-lg bg-white/10 text-slate-200';
+            });
+            window.scrollTo({top:0,behavior:'smooth'});
+            if (window.lucide) lucide.createIcons();
+        };
+
+        // --- FX RATES ---
+        window.fetchLiveFXRates = async function(notify = false) {
+            const statusEl = document.getElementById('fx-api-status');
+            try {
+                const res = await fetch('https://open.er-api.com/v6/latest/USD');
+                if (!res.ok) throw new Error('FX unavailable');
+                const data = await res.json();
+                if (data && data.rates) {
+                    Object.keys(CURRENCIES).forEach(c => { if (data.rates[c]) CURRENCIES[c].rate = data.rates[c]; });
+                    rateLockSeconds = 299; recalculate();
+                    if (statusEl) statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Live FX Feed';
+                    if (notify) showToast('FX rates updated!', 'success');
+                }
+            } catch(e) {
+                if (statusEl) statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Cached Rates';
+                if (notify) showToast('Using cached rates.', 'success');
+            }
+        };
+
+        function startRateLockCountdown() {
+            setInterval(() => {
+                rateLockSeconds = rateLockSeconds > 0 ? rateLockSeconds - 1 : 299;
+                const m = String(Math.floor(rateLockSeconds/60)).padStart(2,'0');
+                const s = String(rateLockSeconds%60).padStart(2,'0');
+                const el = document.getElementById('rate-timer');
+                if (el) el.textContent = `Lock: ${m}:${s}`;
+            }, 1000);
+        }
+
+        // --- CALCULATOR ---
+        function populateCurrencyDropdowns() {
+            const ss = document.getElementById('send-currency');
+            const rs = document.getElementById('receive-currency');
+            if (!ss || !rs) return;
+            ss.innerHTML = ''; rs.innerHTML = '';
+            Object.values(CURRENCIES).forEach(c => { ss.add(new Option(`${c.flag} ${c.code}`, c.code)); rs.add(new Option(`${c.flag} ${c.code}`, c.code)); });
+            ss.value = calcState.sendCurrency; rs.value = calcState.receiveCurrency;
+        }
+
+        function bindCalculatorEvents() {
+            const si = document.getElementById('send-amount');
+            const ri = document.getElementById('receive-amount');
+            const ss = document.getElementById('send-currency');
+            const rs = document.getElementById('receive-currency');
+            const ms = document.getElementById('calc-delivery-method');
+            const sw = document.getElementById('swap-currencies-btn');
+            if (!si || !ri || !ss || !rs || !ms || !sw) return;
+            si.addEventListener('input', () => { calcState.lastEdited='send'; calcState.sendAmount = Math.max(0, parseFloat(si.value)||0); recalculate(); });
+            ri.addEventListener('input', () => { calcState.lastEdited='receive'; calcState.receiveAmount = Math.max(0, parseFloat(ri.value)||0); recalculate(); });
+            ss.addEventListener('change', e => { if (e.target.value===calcState.receiveCurrency){calcState.receiveCurrency=calcState.sendCurrency;rs.value=calcState.receiveCurrency;} calcState.sendCurrency=e.target.value; recalculate(); });
+            rs.addEventListener('change', e => { if (e.target.value===calcState.sendCurrency){calcState.sendCurrency=calcState.receiveCurrency;ss.value=calcState.sendCurrency;} calcState.receiveCurrency=e.target.value; recalculate(); });
+            ms.addEventListener('change', e => { calcState.method = e.target.value; recalculate(); });
+            sw.addEventListener('click', () => { const t=calcState.sendCurrency; calcState.sendCurrency=calcState.receiveCurrency; calcState.receiveCurrency=t; ss.value=calcState.sendCurrency; rs.value=calcState.receiveCurrency; calcState.lastEdited='send'; recalculate(); });
+        }
+
+        function getExchangeRate(from, to) { return CURRENCIES[to].rate / CURRENCIES[from].rate; }
+
+        function calculateFeeInSendCurrency(amount, sendCode, methodKey) {
+            if (amount <= 0) return 0;
+            const cfg = DELIVERY_CONFIG[methodKey];
+            const usdRate = CURRENCIES[sendCode].rate;
+            return cfg.baseFeeUSD * usdRate + amount * cfg.pctFee;
+        }
+
+        function recalculate() {
+            const rate = getExchangeRate(calcState.sendCurrency, calcState.receiveCurrency);
+            const cfg = DELIVERY_CONFIG[calcState.method];
+            let fee = 0, net = 0;
+            if (calcState.lastEdited === 'send') {
+                fee = calculateFeeInSendCurrency(calcState.sendAmount, calcState.sendCurrency, calcState.method);
+                net = Math.max(0, calcState.sendAmount - fee);
+                calcState.receiveAmount = net * rate;
+                const re = document.getElementById('receive-amount');
+                if (re) re.value = calcState.receiveAmount > 0 ? calcState.receiveAmount.toFixed(2) : '';
+            } else {
+                net = rate > 0 ? (calcState.receiveAmount / rate) : 0;
+                const usdRate = CURRENCIES[calcState.sendCurrency].rate;
+                const fixed = cfg.baseFeeUSD * usdRate;
+                calcState.sendAmount = calcState.receiveAmount > 0 ? (net + fixed) / (1 - cfg.pctFee) : 0;
+                fee = Math.max(0, calcState.sendAmount - net);
+                const se = document.getElementById('send-amount');
+                if (se) se.value = calcState.sendAmount > 0 ? calcState.sendAmount.toFixed(2) : '';
+            }
+            document.getElementById('calc-fee').textContent = `${formatNumber(fee)} ${calcState.sendCurrency}`;
+            document.getElementById('calc-net-amount').textContent = `${formatNumber(net)} ${calcState.sendCurrency}`;
+            const fr = rate >= 10 ? rate.toFixed(2) : rate.toFixed(4);
+            document.getElementById('calc-rate-display').textContent = `1 ${calcState.sendCurrency} = ${fr} ${calcState.receiveCurrency}`;
+            document.getElementById('calc-eta').textContent = cfg.eta;
+            const savings = (calcState.sendAmount / CURRENCIES[calcState.sendCurrency].rate) * 0.036;
+            document.getElementById('calc-savings').textContent = `Save ~$${Math.max(1.5,savings).toFixed(2)} vs banks`;
+        }
+
+        // --- UTILS ---
+        function formatNumber(n) { return Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+        window.copyTrackingId = function() {
+            const t = document.getElementById('tracker-id').textContent;
+            navigator.clipboard?.writeText(t);
+            showToast(`Copied ${t}`, 'success');
+        };
+
+        function showToast(msg, type = 'success') {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = `${type==='error'?'bg-red-600 text-white':'bg-navy-900 text-white border border-emerald-500/40'} px-4 py-3 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2.5 pointer-events-auto transition-all duration-300`;
+            t.innerHTML = `<span class="w-2 h-2 rounded-full ${type==='error'?'bg-white':'bg-emerald-400'}"></span><span>${msg}</span>`;
+            c.appendChild(t);
+            setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3400);
+        }
+    </script>
+</body>
+</html>
+HTMLEOF
